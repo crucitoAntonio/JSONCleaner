@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Limpiador y Comparador de JSON</title>
+  </head>
+  <body>
+    <nav class="app-nav">
+      <button class="app-nav-btn active" data-app="jsoncleaner">🧹 JSON Cleaner</button>
+      <button class="app-nav-btn" data-app="crashlytics">💥 Crashlytics</button>
+    </nav>
+
+    <div class="app-view" data-app-view="jsoncleaner">
+      <header>
+        <div class="title-row">
+          <button
+            id="toggleSidebarBtn"
+            class="small icon-btn"
+            title="Mostrar/ocultar archivos guardados"
+          >
+            📁
+          </button>
+          <div class="title">
+            <h1>Limpiador y Comparador de JSON</h1>
+            <p>
+              Pega logs de Logcat o JSON crudo en cada documento. Formatea, explora en Árbol/Tabla y
+              compara diferencias.
+            </p>
+          </div>
+        </div>
+        <div class="compare-controls">
+          <div class="legend" id="legend" hidden>
+            <span><i class="lg-added"></i>Agregado</span>
+            <span><i class="lg-removed"></i>Eliminado</span>
+            <span><i class="lg-changed"></i>Cambiado</span>
+          </div>
+          <span class="badge" id="diffBadge" hidden></span>
+          <button id="swapBtn" class="small icon-btn" title="Intercambiar Documento A y B">
+            ⇄
+          </button>
+          <button id="compareBtn" class="toggle icon-btn" title="Comparar documentos">🆚</button>
+        </div>
+      </header>
+
+      <div class="app-body">
+        <aside id="sidebar">
+          <div class="sidebar-header">
+            <span>Archivos guardados</span>
+          </div>
+          <div class="storage-meter" id="storageMeter">
+            <div class="storage-meter-track">
+              <div class="storage-meter-bar" id="storageMeterBar"></div>
+            </div>
+            <div class="storage-meter-label" id="storageMeterLabel"></div>
+          </div>
+          <div class="sidebar-list" id="sidebarList"></div>
+        </aside>
+
+        <main class="dual" id="mainDual">
+          <!-- Panel A -->
+          <section class="doc-panel" data-side="left">
+            <div class="panel-toolbar">
+              <input
+                type="text"
+                class="panel-label-input"
+                value="Documento A"
+                data-side="left"
+                spellcheck="false"
+              />
+              <div class="mode-tabs" data-side="left">
+                <button data-mode="text" class="active">Texto</button>
+                <button data-mode="tree">Árbol</button>
+                <button data-mode="table">Tabla</button>
+              </div>
+              <div class="panel-actions" data-side="left">
+                <button data-action="format" class="primary icon-btn" title="Formatear">✨</button>
+                <button data-action="save" class="icon-btn" title="Guardar">💾</button>
+                <button data-action="file" class="icon-btn" title="Cargar archivo">📂</button>
+                <input type="file" class="file-input" hidden accept=".json,.log,.txt" />
+                <button data-action="copy" class="icon-btn" title="Copiar">📋</button>
+                <button data-action="download" class="icon-btn" title="Descargar">⬇️</button>
+                <button data-action="clear" class="icon-btn" title="Limpiar">🧹</button>
+              </div>
+            </div>
+            <div class="panel-status-row">
+              <span class="badge status" data-status="left">Vacío</span>
+            </div>
+            <div class="panel-body">
+              <div class="text-view-wrap view" data-view="text">
+                <div class="editor-stack">
+                  <pre class="highlight-layer" aria-hidden="true"></pre>
+                  <textarea
+                    class="editor"
+                    placeholder="Pega aquí el log o JSON del Documento A..."
+                    spellcheck="false"
+                  ></textarea>
+                </div>
+                <div class="diff-preview-block" hidden>
+                  <div class="diff-preview-header">
+                    <span class="diff-toggle-icon">▸</span>Diferencias (línea por línea)
+                  </div>
+                  <div class="diff-pre-wrap"></div>
+                </div>
+              </div>
+              <div class="tree-view view" data-view="tree" hidden></div>
+              <div class="table-view view" data-view="table" hidden></div>
+            </div>
+          </section>
+
+          <!-- Panel B -->
+          <section class="doc-panel" data-side="right">
+            <div class="panel-toolbar">
+              <input
+                type="text"
+                class="panel-label-input"
+                value="Documento B"
+                data-side="right"
+                spellcheck="false"
+              />
+              <div class="mode-tabs" data-side="right">
+                <button data-mode="text" class="active">Texto</button>
+                <button data-mode="tree">Árbol</button>
+                <button data-mode="table">Tabla</button>
+              </div>
+              <div class="panel-actions" data-side="right">
+                <button data-action="format" class="primary icon-btn" title="Formatear">✨</button>
+                <button data-action="save" class="icon-btn" title="Guardar">💾</button>
+                <button data-action="file" class="icon-btn" title="Cargar archivo">📂</button>
+                <input type="file" class="file-input" hidden accept=".json,.log,.txt" />
+                <button data-action="copy" class="icon-btn" title="Copiar">📋</button>
+                <button data-action="download" class="icon-btn" title="Descargar">⬇️</button>
+                <button data-action="clear" class="icon-btn" title="Limpiar">🧹</button>
+              </div>
+            </div>
+            <div class="panel-status-row">
+              <span class="badge status" data-status="right">Vacío</span>
+            </div>
+            <div class="panel-body">
+              <div class="text-view-wrap view" data-view="text">
+                <div class="editor-stack">
+                  <pre class="highlight-layer" aria-hidden="true"></pre>
+                  <textarea
+                    class="editor"
+                    placeholder="Pega aquí el log o JSON del Documento B..."
+                    spellcheck="false"
+                  ></textarea>
+                </div>
+                <div class="diff-preview-block" hidden>
+                  <div class="diff-preview-header">
+                    <span class="diff-toggle-icon">▸</span>Diferencias (línea por línea)
+                  </div>
+                  <div class="diff-pre-wrap"></div>
+                </div>
+              </div>
+              <div class="tree-view view" data-view="tree" hidden></div>
+              <div class="table-view view" data-view="table" hidden></div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <div class="app-view" data-app-view="crashlytics" hidden>
+      <header>
+        <div class="title-row">
+          <div class="title">
+            <h1>Crashlytics — Formateador de trazas</h1>
+            <p>
+              Pega una traza de excepción (Crashlytics / Logcat), acomódala y resalta tus clases vs.
+              framework y librerías.
+            </p>
+          </div>
+        </div>
+        <div class="compare-controls">
+          <input
+            type="text"
+            id="crashPkgInput"
+            class="panel-label-input crash-pkg-input"
+            placeholder="Paquete de tu app, ej. com.example.app"
+            spellcheck="false"
+          />
+        </div>
+      </header>
+
+      <div class="app-body">
+        <section class="doc-panel crash-panel">
+          <div class="panel-toolbar">
+            <span class="crash-toolbar-title">Traza</span>
+            <div class="panel-actions">
+              <button
+                data-crash-action="format"
+                class="primary icon-btn"
+                title="Formatear (acomoda indentación y agrupa frames repetidos)"
+              >
+                ✨
+              </button>
+              <button data-crash-action="copy" class="icon-btn" title="Copiar">📋</button>
+              <button data-crash-action="download" class="icon-btn" title="Descargar">⬇️</button>
+              <button data-crash-action="clear" class="icon-btn" title="Limpiar">🧹</button>
+            </div>
+          </div>
+          <div class="crash-legend">
+            <span><i class="cl-app"></i>Tu app</span>
+            <span><i class="cl-android"></i>Android/AndroidX</span>
+            <span><i class="cl-lang"></i>Java/Kotlin</span>
+            <span><i class="cl-lib"></i>Librerías</span>
+            <span><i class="cl-header"></i>Excepción</span>
+          </div>
+          <div class="panel-body">
+            <div class="editor-stack">
+              <pre class="highlight-layer crash-highlight" aria-hidden="true"></pre>
+              <textarea
+                class="editor crash-editor"
+                placeholder="Pega aquí la traza de Crashlytics..."
+                spellcheck="false"
+              ></textarea>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script type="module" src="/src/app/main.ts"></script>
+  </body>
+</html>

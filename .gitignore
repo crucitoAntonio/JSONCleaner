@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.DS_Store
+*.local
+.claude/
+
+# Documentación / archivos de Claude: no se suben al repo
+*.md
+
+# Tests: solo locales
+tests/

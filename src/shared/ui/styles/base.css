@@ -1,0 +1,132 @@
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+header .title h1 {
+  font-size: 16px;
+  margin: 0;
+  font-weight: 600;
+}
+header .title p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.compare-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  font-size: 11.5px;
+  padding: 3px 9px;
+  border-radius: 100px;
+  background: var(--idle-bg);
+  color: var(--idle-text);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+button {
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+  white-space: nowrap;
+}
+button:hover {
+  border-color: var(--accent);
+}
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+button.primary:hover {
+  background: var(--accent-hover);
+}
+button.toggle.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+button.small {
+  padding: 4px 9px;
+  font-size: 11.5px;
+}
+button.icon-btn {
+  padding: 6px 10px;
+  font-size: 15px;
+  line-height: 1;
+  min-width: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+button.icon-btn.small {
+  min-width: 26px;
+  padding: 4px 7px;
+  font-size: 12.5px;
+}
+
+.err-box {
+  margin: 14px;
+  padding: 12px 14px;
+  background: var(--error-bg);
+  color: var(--error-text);
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-family: var(--mono);
+  white-space: pre-wrap;
+}
+.warn-box {
+  margin: 14px;
+  padding: 10px 14px;
+  background: var(--idle-bg);
+  color: var(--muted);
+  border-radius: 8px;
+  font-size: 12.5px;
+}

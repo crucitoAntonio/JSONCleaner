@@ -1,0 +1,92 @@
+.crash-pkg-input {
+  border-color: var(--border) !important;
+  background: var(--panel) !important;
+  color: var(--text) !important;
+  min-width: 220px;
+  max-width: 320px;
+}
+.crash-toolbar-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.crash-legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 6px 14px;
+  font-size: 11.5px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  background: var(--panel-alt);
+}
+.crash-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.crash-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+.crash-legend .cl-app {
+  background: var(--trace-app);
+}
+.crash-legend .cl-android {
+  background: var(--muted);
+}
+.crash-legend .cl-lang {
+  background: var(--muted);
+  opacity: 0.55;
+}
+.crash-legend .cl-lib {
+  background: var(--trace-lib);
+}
+.crash-legend .cl-header {
+  background: var(--error-text);
+}
+
+.tr-at {
+  color: var(--muted);
+}
+.tr-app {
+  color: var(--trace-app);
+  font-weight: 700;
+  background: var(--trace-app-bg);
+  border-radius: 4px;
+  padding: 0 2px;
+}
+.tr-android {
+  color: var(--muted);
+}
+.tr-lang {
+  color: var(--muted);
+  font-style: italic;
+}
+.tr-lib {
+  color: var(--trace-lib);
+  font-weight: 600;
+}
+.tr-loc {
+  color: var(--muted);
+  font-style: italic;
+}
+.tr-more {
+  color: var(--muted);
+  font-style: italic;
+}
+.tr-header {
+  color: var(--error-text);
+  font-weight: 700;
+}
+.tr-caused {
+  color: var(--error-text);
+  font-weight: 700;
+}
+.tr-repeat {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 11px;
+}
