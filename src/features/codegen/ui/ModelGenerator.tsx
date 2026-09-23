@@ -135,17 +135,17 @@ export function ModelGenerator() {
     <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, minWidth: 0 }}>
       <Stack
         direction="row"
-        sx={{ alignItems: 'center', flexWrap: 'wrap', gap: 1.5, px: { xs: 1.5, sm: 2.5 }, py: 1.5 }}
+        sx={{ alignItems: 'center', flexWrap: 'wrap', gap: 1.5, px: { xs: 1.5, sm: 2 }, py: 1 }}
       >
-        <Box sx={{ flex: '1 1 320px', minWidth: 0 }}>
-          <Typography variant="h6" component="h1" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
-            Generador de modelos
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Pega un JSON/YAML de datos o un spec Swagger/OpenAPI y obtén data classes de Kotlin o
-            POJOs de Java. Todo se procesa en tu navegador.
-          </Typography>
-        </Box>
+        <Typography
+          variant="body2"
+          noWrap
+          sx={{ flex: '1 1 0', minWidth: 0, color: 'text.secondary' }}
+          title="JSON/YAML de datos o spec Swagger/OpenAPI → data classes de Kotlin o POJOs de Java, procesado en tu navegador."
+        >
+          JSON/YAML de datos o spec Swagger/OpenAPI → data classes de Kotlin o POJOs de Java,
+          procesado en tu navegador.
+        </Typography>
         <Stack direction="row" sx={{ alignItems: 'center', flexWrap: 'wrap', gap: 1.5 }}>
           <ToggleButtonGroup
             size="small"

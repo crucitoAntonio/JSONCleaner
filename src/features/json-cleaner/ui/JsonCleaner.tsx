@@ -74,6 +74,8 @@ export function JsonCleaner() {
   });
   const [comparing, setComparing] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 860);
+  // Panel a pantalla completa: oculta el otro documento y la barra lateral.
+  const [maximized, setMaximized] = useState<Side | null>(null);
   const [saved, setSaved] = useState(readDocs);
   const [dialog, setDialog] = useState<DialogState | null>(null);
   const [dialogKey, setDialogKey] = useState(0);
@@ -159,7 +161,7 @@ export function JsonCleaner() {
     <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, minWidth: 0 }}>
       <Stack
         direction="row"
-        sx={{ alignItems: 'center', flexWrap: 'wrap', gap: 1.5, px: { xs: 1.5, sm: 2.5 }, py: 1.5 }}
+        sx={{ alignItems: 'center', flexWrap: 'wrap', gap: 1.5, px: { xs: 1.5, sm: 2 }, py: 1 }}
       >
         <Tooltip title="Mostrar/ocultar archivos guardados">
           <IconButton
@@ -170,15 +172,15 @@ export function JsonCleaner() {
             <ViewSidebarOutlinedIcon sx={{ transform: 'scaleX(-1)' }} />
           </IconButton>
         </Tooltip>
-        <Box sx={{ flex: '1 1 320px', minWidth: 0 }}>
-          <Typography variant="h6" component="h1" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
-            Limpiador y Comparador de JSON
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Pega logs de Logcat o JSON crudo en cada documento. Formatea, explora en Árbol/Tabla y
-            compara diferencias.
-          </Typography>
-        </Box>
+        <Typography
+          variant="body2"
+          noWrap
+          sx={{ flex: '1 1 0', minWidth: 0, color: 'text.secondary' }}
+          title="Pega logs de Logcat o JSON crudo en cada documento: formatea, explora en Árbol/Tabla y compara."
+        >
+          Pega logs de Logcat o JSON crudo en cada documento: formatea, explora en Árbol/Tabla y
+          compara.
+        </Typography>
         <Stack direction="row" sx={{ alignItems: 'center', flexWrap: 'wrap', gap: 1.25 }}>
           {comparing && (
             <>
@@ -230,7 +232,7 @@ export function JsonCleaner() {
           overflow: { xs: 'auto', md: 'hidden' },
         }}
       >
-        {sidebarOpen && (
+        {sidebarOpen && !maximized && (
           <SavedDocsSidebar
             docs={saved.docs}
             usageBytes={saved.usage}
@@ -252,21 +254,25 @@ export function JsonCleaner() {
             gap: 1.5,
           }}
         >
-          {(['left', 'right'] as const).map((side) => (
-            <DocPanel
-              key={side}
-              side={side}
-              data={panels[side]}
-              parse={parses[side]}
-              comparing={comparing}
-              diffRoot={diff?.root ?? null}
-              diffOps={diff ? (diff.ops ? diff.ops[side] : null) : undefined}
-              onChange={(patch) => update(side, patch)}
-              onFormat={(text) => format(side, text)}
-              onSave={() => requestSave(side)}
-              onNotify={(message) => setToast({ message, severity: 'success' })}
-            />
-          ))}
+          {(['left', 'right'] as const)
+            .filter((side) => !maximized || maximized === side)
+            .map((side) => (
+              <DocPanel
+                key={side}
+                side={side}
+                data={panels[side]}
+                parse={parses[side]}
+                comparing={comparing}
+                diffRoot={diff?.root ?? null}
+                diffOps={diff ? (diff.ops ? diff.ops[side] : null) : undefined}
+                onChange={(patch) => update(side, patch)}
+                onFormat={(text) => format(side, text)}
+                onSave={() => requestSave(side)}
+                onNotify={(message) => setToast({ message, severity: 'success' })}
+                maximized={maximized === side}
+                onToggleMaximize={() => setMaximized((m) => (m === side ? null : side))}
+              />
+            ))}
         </Box>
       </Box>
 

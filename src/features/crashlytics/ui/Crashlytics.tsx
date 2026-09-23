@@ -77,17 +77,17 @@ export function Crashlytics() {
     <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, minWidth: 0 }}>
       <Stack
         direction="row"
-        sx={{ alignItems: 'center', flexWrap: 'wrap', gap: 1.5, px: { xs: 1.5, sm: 2.5 }, py: 1.5 }}
+        sx={{ alignItems: 'center', flexWrap: 'wrap', gap: 1.5, px: { xs: 1.5, sm: 2 }, py: 1 }}
       >
-        <Box sx={{ flex: '1 1 320px', minWidth: 0 }}>
-          <Typography variant="h6" component="h1" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
-            Crashlytics — Formateador de trazas
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Pega una traza de excepción (Crashlytics / Logcat), acomódala y resalta tus clases vs.
-            framework y librerías.
-          </Typography>
-        </Box>
+        <Typography
+          variant="body2"
+          noWrap
+          sx={{ flex: '1 1 0', minWidth: 0, color: 'text.secondary' }}
+          title="Pega una traza de excepción (Crashlytics / Logcat) para acomodarla y resaltar tus clases vs. framework y librerías."
+        >
+          Pega una traza de excepción (Crashlytics / Logcat) para acomodarla y resaltar tus clases
+          vs. framework y librerías.
+        </Typography>
         <TextField
           size="small"
           label="Paquete de tu app"
