@@ -1,0 +1,44 @@
+/* Editor con resaltado: un <textarea> transparente encima de un <pre> con el HTML resaltado.
+   Ambos comparten exactamente la misma tipografía y padding para que el texto coincida píxel a
+   píxel; el scroll del <pre> se sincroniza con el del textarea desde CodeEditor.tsx. */
+
+.editor-stack {
+  position: relative;
+  flex: 1;
+  min-height: 80px;
+  overflow: hidden;
+}
+.editor-stack .highlight-layer,
+.editor-stack textarea {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 14px 16px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: auto;
+  box-sizing: border-box;
+  tab-size: 2;
+}
+.editor-stack .highlight-layer {
+  color: var(--mui-palette-text-primary);
+  pointer-events: none;
+  user-select: none;
+}
+.editor-stack textarea {
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--mui-palette-text-primary);
+}
+.editor-stack textarea::selection {
+  background: rgba(var(--mui-palette-primary-mainChannel) / 0.28);
+}
+.editor-stack textarea::placeholder {
+  color: var(--mui-palette-text-secondary);
+}

@@ -1,17 +1,19 @@
 // @ts-check
 import js from '@eslint/js';
+import reactHooks from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   { ignores: ['dist/**', 'node_modules/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
+  reactHooks.configs.flat.recommended,
   {
     // Fronteras entre features: nada debe importar un archivo interno de otra
     // feature — solo su index.ts público. shared/ no debe importar de features/.
     // Los tests SÍ pueden importar internals directamente (whitebox testing),
     // por eso este bloque solo aplica dentro de src/.
-    files: ['src/**/*.ts'],
+    files: ['src/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -23,6 +25,9 @@ export default tseslint.config(
                 '**/features/json-cleaner/ui/*',
                 '**/features/crashlytics/model/*',
                 '**/features/crashlytics/ui/*',
+                '**/features/codegen/model/*',
+                '**/features/codegen/ui/*',
+                '**/features/swagger/ui/*',
               ],
               message:
                 'Importa solo desde el index.ts público de la feature, no de sus archivos internos.',

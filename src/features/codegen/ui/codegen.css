@@ -1,0 +1,12 @@
+pre.code-output {
+  margin: 0;
+  padding: 14px 16px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  tab-size: 4;
+}
+.code-comment {
+  color: var(--mui-palette-text-secondary);
+  font-style: italic;
+}

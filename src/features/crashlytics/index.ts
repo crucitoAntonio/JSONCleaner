@@ -1,7 +1,1 @@
-import './ui/crashlytics.css';
-
-import { initCrashPanel } from './ui/crash-panel';
-
-export function initCrashlytics(): void {
-  initCrashPanel();
-}
+export { Crashlytics } from './ui/Crashlytics';

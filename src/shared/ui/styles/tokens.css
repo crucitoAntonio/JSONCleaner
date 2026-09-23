@@ -1,53 +1,53 @@
+/* Colores que MUI no cubre: resaltado de sintaxis, diff y trazas. El resto (fondos, textos,
+   bordes, primario) sale del tema de MUI en src/app/theme.ts. MUI escribe el esquema activo en
+   <html data-theme="light|dark">; el script inline de index.html lo aplica antes del primer
+   pintado para evitar el parpadeo. */
+
 :root {
-  --bg: #f5f5f7;
-  --panel: #ffffff;
-  --panel-alt: #fafafb;
-  --border: #d9d9de;
-  --text: #1c1c1e;
-  --muted: #6e6e73;
-  --accent: #0a7cff;
-  --accent-hover: #0864d1;
-  --error-bg: #fdecea;
-  --error-text: #a4242b;
-  --ok-bg: #e8f8ee;
-  --ok-text: #1c7c3f;
-  --idle-bg: #eee;
-  --idle-text: #6e6e73;
-  --added-bg: rgba(40, 167, 69, 0.2);
-  --added-text: #1c7c3f;
-  --removed-bg: rgba(220, 53, 69, 0.2);
-  --removed-text: #a4242b;
-  --changed-bg: rgba(255, 193, 7, 0.28);
-  --changed-text: #7a5b00;
-  --mono: 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
+  --mono: 'SF Mono', ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace;
+
+  --added-bg: rgba(34, 160, 80, 0.16);
+  --removed-bg: rgba(220, 45, 60, 0.14);
+  --changed-bg: rgba(234, 170, 8, 0.22);
+
+  --syn-key: #0550ae;
+  --syn-str: #116329;
+  --syn-num: #b35900;
+  --syn-bool: #cf222e;
+
   --trace-app: #c2185b;
-  --trace-app-bg: rgba(194, 24, 91, 0.14);
+  --trace-app-bg: rgba(194, 24, 91, 0.1);
   --trace-lib: #6b4fbb;
+  --trace-header: #b42318;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1c1c1e;
-    --panel: #2a2a2d;
-    --panel-alt: #232325;
-    --border: #3d3d40;
-    --text: #f2f2f2;
-    --muted: #9a9a9f;
-    --accent: #3b9dff;
-    --accent-hover: #63b1ff;
-    --error-bg: #3a1f1f;
-    --error-text: #ff8a80;
-    --ok-bg: #16321f;
-    --ok-text: #6fdd97;
-    --idle-bg: #333336;
-    --idle-text: #9a9a9f;
-    --added-bg: rgba(40, 167, 69, 0.28);
-    --added-text: #6fdd97;
-    --removed-bg: rgba(220, 53, 69, 0.3);
-    --removed-text: #ff8a80;
-    --changed-bg: rgba(255, 193, 7, 0.3);
-    --changed-text: #ffd766;
-    --trace-app: #ff79c6;
-    --trace-app-bg: rgba(255, 121, 198, 0.22);
-    --trace-lib: #b39dff;
-  }
+
+:root[data-theme='dark'] {
+  --added-bg: rgba(46, 180, 90, 0.22);
+  --removed-bg: rgba(230, 70, 80, 0.24);
+  --changed-bg: rgba(240, 190, 30, 0.22);
+
+  --syn-key: #9cdcfe;
+  --syn-str: #ce9178;
+  --syn-num: #b5cea8;
+  --syn-bool: #569cd6;
+
+  --trace-app: #ff79c6;
+  --trace-app-bg: rgba(255, 121, 198, 0.16);
+  --trace-lib: #b39dff;
+  --trace-header: #ff8a80;
+}
+
+/* Clases que emiten las funciones de resaltado de model/ (highlight.ts, tokenizer.ts) */
+.k {
+  color: var(--syn-key);
+  font-weight: 600;
+}
+.s {
+  color: var(--syn-str);
+}
+.n {
+  color: var(--syn-num);
+}
+.b {
+  color: var(--syn-bool);
 }
