@@ -34,6 +34,7 @@ const initialPanel = (name: string): PanelData => ({
   name,
   mode: 'text',
   diffExpanded: false,
+  query: '',
 });
 
 type DialogState =

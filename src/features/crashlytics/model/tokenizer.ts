@@ -8,6 +8,8 @@ export const TRACE_CAUSED = /^\s*Caused by:\s*(.*)$/i;
 export const TRACE_SUPPRESSED = /^\s*Suppressed:\s*(.*)$/i;
 export const TRACE_EXCEPTION_HEAD = /[A-Za-z_$][\w$]*(?:\.[\w$]+)*(?:Exception|Error|Throwable)\b/;
 export const TRACE_REPEAT_SUFFIX = /\s{2}\(×(\d+)\)$/;
+/** Encabezado que `normalizeTraceText` pone antes de un bloque de frames repetido. */
+export const TRACE_CYCLE = /^\s*↻ Se repite (\d+) veces \((\d+) frames\):$/;
 
 export function classifyTraceClass(classPath: string, appPkg: string): FrameCategory {
   if (appPkg && classPath.indexOf(appPkg) === 0) return 'tr-app';
@@ -51,6 +53,7 @@ function highlightTraceCore(line: string, appPkg: string): string {
       '</span>)'
     );
   }
+  if (TRACE_CYCLE.test(line)) return '<span class="tr-repeat">' + escapeHtml(line) + '</span>';
   if (TRACE_MORE.test(line)) return '<span class="tr-more">' + escapeHtml(line) + '</span>';
   const causedMatch = line.match(TRACE_CAUSED);
   if (causedMatch)
