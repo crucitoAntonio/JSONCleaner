@@ -21,6 +21,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DownloadIcon from '@mui/icons-material/Download';
 import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
 import { CodeEditor } from '../../../shared/ui/CodeEditor';
+import { track } from '../../../shared/lib/analytics';
 import { downloadText } from '../../../shared/lib/download';
 import { escapeHtml } from '../../../shared/lib/dom';
 import type { GenerateResult, TargetLang } from '../model/generate';
@@ -230,6 +231,7 @@ export function ModelGenerator() {
                 size="small"
                 startIcon={<ScienceOutlinedIcon />}
                 onClick={() => {
+                  track('codegen_example');
                   setText(EXAMPLE_SPEC);
                   setFileIdx(0);
                 }}
@@ -283,10 +285,11 @@ export function ModelGenerator() {
                     size="small"
                     disabled={!file}
                     aria-label="Copiar"
-                    onClick={() =>
-                      file &&
-                      void navigator.clipboard.writeText(file.code).then(() => setCopied(true))
-                    }
+                    onClick={() => {
+                      if (!file) return;
+                      track('codegen_copy', { lang });
+                      void navigator.clipboard.writeText(file.code).then(() => setCopied(true));
+                    }}
                   >
                     <ContentCopyIcon fontSize="small" />
                   </IconButton>
@@ -298,7 +301,11 @@ export function ModelGenerator() {
                     size="small"
                     disabled={!file}
                     aria-label="Descargar"
-                    onClick={() => file && downloadText(file.code, file.name, 'text/plain')}
+                    onClick={() => {
+                      if (!file) return;
+                      track('codegen_download', { lang });
+                      downloadText(file.code, file.name, 'text/plain');
+                    }}
                   >
                     <DownloadIcon fontSize="small" />
                   </IconButton>

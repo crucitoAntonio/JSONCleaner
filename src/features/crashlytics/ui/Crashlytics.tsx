@@ -16,6 +16,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DownloadIcon from '@mui/icons-material/Download';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import { CodeEditor } from '../../../shared/ui/CodeEditor';
+import { track } from '../../../shared/lib/analytics';
 import { downloadText } from '../../../shared/lib/download';
 import { normalizeTraceText } from '../model/formatter';
 import { syntaxHighlightTrace } from '../model/tokenizer';
@@ -55,20 +56,28 @@ export function Crashlytics() {
       title: 'Formatear (acomoda indentación y agrupa frames repetidos)',
       icon: <AutoAwesomeIcon fontSize="small" />,
       primary: true,
-      onClick: () => setTrace((t) => normalizeTraceText(t)),
+      onClick: () => {
+        track('trace_format');
+        setTrace((t) => normalizeTraceText(t));
+      },
     },
     {
       title: 'Copiar',
       icon: <ContentCopyIcon fontSize="small" />,
       onClick: () => {
-        if (trace) void navigator.clipboard.writeText(trace).then(() => setCopied(true));
+        if (!trace) return;
+        track('trace_copy');
+        void navigator.clipboard.writeText(trace).then(() => setCopied(true));
       },
     },
     {
       title: 'Descargar',
       icon: <DownloadIcon fontSize="small" />,
-      onClick: () =>
-        trace && downloadText(trace, 'crash_trace_' + Date.now() + '.txt', 'text/plain'),
+      onClick: () => {
+        if (!trace) return;
+        track('trace_download');
+        downloadText(trace, 'crash_trace_' + Date.now() + '.txt', 'text/plain');
+      },
     },
     { title: 'Limpiar', icon: <ClearAllIcon fontSize="small" />, onClick: () => setTrace('') },
   ];

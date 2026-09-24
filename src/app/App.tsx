@@ -22,6 +22,7 @@ import SettingsBrightnessOutlinedIcon from '@mui/icons-material/SettingsBrightne
 import { JsonCleaner } from '../features/json-cleaner';
 import { Crashlytics } from '../features/crashlytics';
 import { SwaggerEditor } from '../features/swagger';
+import { track } from '../shared/lib/analytics';
 import { THEME_STORAGE_KEY, theme } from './theme';
 
 // quicktype pesa ~1 MB: el generador de modelos se descarga solo al abrir su pestaña.
@@ -96,6 +97,7 @@ export function App() {
   const [visited, setVisited] = useState<Set<View>>(() => new Set(['jsoncleaner']));
   const open = (v: View) => {
     setView(v);
+    track('tab_open', { tab: v });
     setVisited((s) => (s.has(v) ? s : new Set(s).add(v)));
   };
 

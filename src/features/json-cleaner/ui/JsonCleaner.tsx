@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import ViewSidebarOutlinedIcon from '@mui/icons-material/ViewSidebarOutlined';
+import { track } from '../../../shared/lib/analytics';
 import type { Side } from '../../../shared/types';
 import { countDiffStats, diffNode } from '../model/diff';
 import { diffLines } from '../model/diff-lines';
@@ -109,6 +110,7 @@ export function JsonCleaner() {
   };
 
   const format = (side: Side, text = panels[side].text) => {
+    track('json_format');
     const result = parsePanelText(text);
     if (result.valid) {
       update(side, { text: JSON.stringify(result.parsed, null, 2) });
@@ -136,6 +138,7 @@ export function JsonCleaner() {
   };
 
   const commitSave = (side: Side, name: string) => {
+    track('json_save');
     try {
       persistSavedDocs(upsertDoc(loadSavedDocs(), name, outputOf(side)));
     } catch {
@@ -210,7 +213,10 @@ export function JsonCleaner() {
               size="small"
               color="primary"
               selected={comparing}
-              onChange={() => setComparing((c) => !c)}
+              onChange={() => {
+                if (!comparing) track('json_compare');
+                setComparing((c) => !c);
+              }}
               sx={{ gap: 0.75, px: 1.5 }}
             >
               <CompareArrowsIcon fontSize="small" />

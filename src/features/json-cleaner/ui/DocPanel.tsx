@@ -31,6 +31,7 @@ import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import type { Side } from '../../../shared/types';
 import { CodeEditor } from '../../../shared/ui/CodeEditor';
+import { track } from '../../../shared/lib/analytics';
 import { downloadText } from '../../../shared/lib/download';
 import { slugify } from '../../../shared/lib/format';
 import type { DiffNode } from '../model/diff';
@@ -163,6 +164,7 @@ export function DocPanel({
   );
 
   const openSearch = () => {
+    track('json_query');
     setSearchOpen(true);
     // Si la fila ya estaba visible, autoFocus no vuelve a correr.
     queryInput.current?.focus();
@@ -182,11 +184,16 @@ export function DocPanel({
   const runMenuAction = (action: MenuAction) => {
     setMenuAnchor(null);
     if (action === 'save') onSave();
-    else if (action === 'load') fileInput.current?.click();
-    else if (action === 'clear') onChange({ text: '' });
+    else if (action === 'load') {
+      track('json_load_file');
+      fileInput.current?.click();
+    } else if (action === 'clear') onChange({ text: '' });
     else {
       const text = output();
-      if (text) downloadJson(text, data.name);
+      if (text) {
+        track('json_download');
+        downloadJson(text, data.name);
+      }
     }
   };
 
@@ -255,7 +262,11 @@ export function DocPanel({
           size="small"
           exclusive
           value={data.mode}
-          onChange={(_, mode: PanelMode | null) => mode && onChange({ mode })}
+          onChange={(_, mode: PanelMode | null) => {
+            if (!mode) return;
+            track('json_view_mode', { mode });
+            onChange({ mode });
+          }}
           sx={{
             flexShrink: 0,
             '& .MuiToggleButton-root': { px: 1.25, py: 0.25 },
@@ -286,6 +297,7 @@ export function DocPanel({
             onClick={() => {
               const text = output();
               if (!text) return;
+              track('json_copy');
               void navigator.clipboard
                 .writeText(text)
                 .then(() => onNotify('Copiado al portapapeles'));
