@@ -22,6 +22,7 @@ import SettingsBrightnessOutlinedIcon from '@mui/icons-material/SettingsBrightne
 import { JsonCleaner } from '../features/json-cleaner';
 import { Crashlytics } from '../features/crashlytics';
 import { SwaggerEditor } from '../features/swagger';
+import { SupportCard } from '../features/support';
 import { track } from '../shared/lib/analytics';
 import { THEME_STORAGE_KEY, theme } from './theme';
 
@@ -186,6 +187,7 @@ export function App() {
           </Box>
         ))}
       </Box>
+      <SupportCard />
     </ThemeProvider>
   );
 }
