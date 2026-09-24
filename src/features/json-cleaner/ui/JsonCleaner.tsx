@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -25,10 +25,12 @@ import {
   persistSavedDocs,
   upsertDoc,
 } from '../model/saved-docs';
+import { loadSplit, saveSplit } from '../model/split';
 import { ConfirmDialog, NameDialog } from './dialogs';
 import { DocPanel } from './DocPanel';
 import type { PanelData } from './DocPanel';
 import { SavedDocsSidebar } from './SavedDocsSidebar';
+import { SplitHandle } from './SplitHandle';
 import './json-cleaner.css';
 
 const initialPanel = (name: string): PanelData => ({
@@ -70,7 +72,6 @@ function LegendDot({ color, label }: { color: string; label: string }) {
 }
 
 export function JsonCleaner() {
-  // Arranca con el borrador de la última visita, si lo hay (recargar no pierde el texto).
   const [panels, setPanels] = useState<Record<Side, PanelData>>(() => {
     const draft = loadDraft();
     return {
@@ -82,6 +83,8 @@ export function JsonCleaner() {
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 860);
   // Panel a pantalla completa: oculta el otro documento y la barra lateral.
   const [maximized, setMaximized] = useState<Side | null>(null);
+  const [split, setSplit] = useState(loadSplit);
+  const splitBox = useRef<HTMLDivElement>(null);
   const [saved, setSaved] = useState(readDocs);
   const [dialog, setDialog] = useState<DialogState | null>(null);
   const [dialogKey, setDialogKey] = useState(0);
@@ -106,8 +109,6 @@ export function JsonCleaner() {
     };
   }, [comparing, leftParse, rightParse]);
 
-  // Guarda el borrador con debounce, y al salir de la página (pagehide) por si recargan
-  // antes de que corra el timer.
   const { left, right } = panels;
   const draft = useMemo(
     () => ({
@@ -276,33 +277,50 @@ export function JsonCleaner() {
           />
         )}
         <Box
+          ref={splitBox}
           sx={{
             flex: 1,
             minWidth: 0,
             minHeight: 0,
             display: 'flex',
             flexDirection: { xs: 'column', md: 'row' },
-            gap: 1.5,
+            gap: { xs: 1.5, md: 0 },
+            '--split': split,
           }}
         >
           {(['left', 'right'] as const)
             .filter((side) => !maximized || maximized === side)
             .map((side) => (
-              <DocPanel
-                key={side}
-                side={side}
-                data={panels[side]}
-                parse={parses[side]}
-                comparing={comparing}
-                diffRoot={diff?.root ?? null}
-                diffOps={diff ? (diff.ops ? diff.ops[side] : null) : undefined}
-                onChange={(patch) => update(side, patch)}
-                onFormat={(text) => format(side, text)}
-                onSave={() => requestSave(side)}
-                onNotify={(message) => setToast({ message, severity: 'success' })}
-                maximized={maximized === side}
-                onToggleMaximize={() => setMaximized((m) => (m === side ? null : side))}
-              />
+              <Fragment key={side}>
+                {side === 'right' && !maximized && (
+                  <SplitHandle
+                    containerRef={splitBox}
+                    value={split}
+                    onCommit={(s) => {
+                      track('json_resize');
+                      setSplit(s);
+                      saveSplit(s);
+                    }}
+                  />
+                )}
+                <DocPanel
+                  side={side}
+                  grow={
+                    maximized ? '1' : side === 'left' ? 'var(--split)' : 'calc(1 - var(--split))'
+                  }
+                  data={panels[side]}
+                  parse={parses[side]}
+                  comparing={comparing}
+                  diffRoot={diff?.root ?? null}
+                  diffOps={diff ? (diff.ops ? diff.ops[side] : null) : undefined}
+                  onChange={(patch) => update(side, patch)}
+                  onFormat={(text) => format(side, text)}
+                  onSave={() => requestSave(side)}
+                  onNotify={(message) => setToast({ message, severity: 'success' })}
+                  maximized={maximized === side}
+                  onToggleMaximize={() => setMaximized((m) => (m === side ? null : side))}
+                />
+              </Fragment>
             ))}
         </Box>
       </Box>

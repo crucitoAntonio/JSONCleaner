@@ -32,6 +32,7 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import type { Side } from '../../../shared/types';
 import { CodeEditor } from '../../../shared/ui/CodeEditor';
 import { track } from '../../../shared/lib/analytics';
+import { hideSupportForAWeek, showSupportNow } from '../../support';
 import { downloadText } from '../../../shared/lib/download';
 import { slugify } from '../../../shared/lib/format';
 import type { DiffNode } from '../model/diff';
@@ -39,6 +40,7 @@ import type { LineOp } from '../model/diff-lines';
 import { syntaxHighlightText } from '../model/highlight';
 import type { PanelParse } from '../model/panel-parse';
 import { runQuery } from '../model/query';
+import { matchSecret } from '../model/secret';
 import { DiffPreview } from './DiffPreview';
 import { TableView } from './TableView';
 import { TreeView } from './TreeView';
@@ -69,6 +71,7 @@ interface DocPanelProps {
   onNotify: (message: string) => void;
   maximized: boolean;
   onToggleMaximize: () => void;
+  grow?: string;
 }
 
 const MODES: { value: PanelMode; label: string; icon: ReactElement }[] = [
@@ -142,6 +145,7 @@ export function DocPanel({
   onNotify,
   maximized,
   onToggleMaximize,
+  grow = '1',
 }: DocPanelProps) {
   const fileInput = useRef<HTMLInputElement>(null);
   const queryInput = useRef<HTMLInputElement>(null);
@@ -209,7 +213,7 @@ export function DocPanel({
         }
       }}
       sx={{
-        flex: 1,
+        flex: { xs: 1, md: `${grow} 1 0` },
         minWidth: 0,
         minHeight: { xs: 360, md: 0 },
         containerType: 'inline-size',
@@ -307,7 +311,26 @@ export function DocPanel({
           <Action
             title="Consultar (⌘/Ctrl + F)"
             active={showSearch}
-            onClick={() => (showSearch ? closeSearch() : openSearch())}
+            onClick={() => {
+              if (side === 'right' && !showSearch) {
+                void matchSecret(data.text).then((secret) => {
+                  if (!secret) return openSearch();
+                  onChange({ text: '' });
+                  if (secret === 'gone') {
+                    track('support_gone');
+                    hideSupportForAWeek();
+                    onNotify('🥚 ¡Lo encontraste! La tarjeta de apoyo se va por una semana.');
+                  } else {
+                    track('support_unlock');
+                    showSupportNow();
+                    onNotify('☕ Tarjeta de apoyo activada.');
+                  }
+                });
+                return;
+              }
+              if (showSearch) closeSearch();
+              else openSearch();
+            }}
             icon={<SearchIcon fontSize="small" />}
           />
           <Action
