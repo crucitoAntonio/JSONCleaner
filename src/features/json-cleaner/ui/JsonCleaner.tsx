@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -15,6 +15,7 @@ import { track } from '../../../shared/lib/analytics';
 import type { Side } from '../../../shared/types';
 import { countDiffStats, diffNode } from '../model/diff';
 import { diffLines } from '../model/diff-lines';
+import { loadDraft, saveDraft } from '../model/draft';
 import { parsePanelText, repairJson } from '../model/panel-parse';
 import type { JsonValue } from '../../../shared/types';
 import type { SavedDoc } from '../model/saved-docs';
@@ -69,9 +70,13 @@ function LegendDot({ color, label }: { color: string; label: string }) {
 }
 
 export function JsonCleaner() {
-  const [panels, setPanels] = useState<Record<Side, PanelData>>({
-    left: initialPanel('Documento A'),
-    right: initialPanel('Documento B'),
+  // Arranca con el borrador de la última visita, si lo hay (recargar no pierde el texto).
+  const [panels, setPanels] = useState<Record<Side, PanelData>>(() => {
+    const draft = loadDraft();
+    return {
+      left: { ...initialPanel('Documento A'), ...draft?.left },
+      right: { ...initialPanel('Documento B'), ...draft?.right },
+    };
   });
   const [comparing, setComparing] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 860);
@@ -100,6 +105,26 @@ export function JsonCleaner() {
       ops: lines ? { left: lines.aOps, right: lines.bOps } : null,
     };
   }, [comparing, leftParse, rightParse]);
+
+  // Guarda el borrador con debounce, y al salir de la página (pagehide) por si recargan
+  // antes de que corra el timer.
+  const { left, right } = panels;
+  const draft = useMemo(
+    () => ({
+      left: { text: left.text, name: left.name },
+      right: { text: right.text, name: right.name },
+    }),
+    [left.text, left.name, right.text, right.name],
+  );
+  useEffect(() => {
+    const save = () => saveDraft(draft);
+    const timer = setTimeout(save, 400);
+    window.addEventListener('pagehide', save);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('pagehide', save);
+    };
+  }, [draft]);
 
   const update = (side: Side, patch: Partial<PanelData>) =>
     setPanels((p) => ({ ...p, [side]: { ...p[side], ...patch } }));
