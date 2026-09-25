@@ -34,6 +34,8 @@ import { ROUTES, SITE_NAME, pageTitle, routeFor } from './routes';
 import type { Category, Route, View } from './routes';
 import { Nav, isPlainClick } from './Nav';
 import { useRoute } from './useRoute';
+import { TOOL_CONTENT } from './seo';
+import { ToolInfo } from './ToolInfo';
 
 // quicktype pesa ~1 MB: el generador de modelos se descarga solo al abrir su pestaña.
 const ModelGenerator = lazy(() =>
@@ -48,6 +50,8 @@ const VIEWS: Record<View, { icon: ReactElement; Component: ComponentType }> = {
   jwt: { icon: <KeyOutlinedIcon fontSize="small" />, Component: JwtDebugger },
   encode: { icon: <SwapHorizIcon fontSize="small" />, Component: Encoder },
 };
+
+const APPBAR_HEIGHT = 57;
 
 const VIEW_ICONS = Object.fromEntries(
   Object.entries(VIEWS).map(([v, { icon }]) => [v, icon]),
@@ -130,6 +134,8 @@ export function App() {
     track('tab_open', { tab: route.view });
   };
 
+  const content = view ? TOOL_CONTENT[view] : undefined;
+
   useEffect(() => {
     document.title = view ? pageTitle(routeFor(view)) : `Página no encontrada · ${SITE_NAME}`;
   }, [view]);
@@ -137,9 +143,9 @@ export function App() {
   return (
     <ThemeProvider theme={theme} modeStorageKey={THEME_STORAGE_KEY} defaultMode="system">
       <CssBaseline enableColorScheme />
-      <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         <AppBar
-          position="static"
+          position="sticky"
           color="inherit"
           elevation={0}
           sx={{ borderBottom: '1px solid', borderColor: 'divider' }}
@@ -176,26 +182,41 @@ export function App() {
         {/* Cada vista se monta la primera vez que se abre y luego queda montada (oculta):
             cambiar de pestaña no pierde el texto pegado, y Swagger/Modelos no cargan nada
             hasta que se usan. */}
-        {ROUTES.filter((r) => visited.has(r.view)).map(({ view: value }) => {
-          const { Component } = VIEWS[value];
-          return (
-            <Box
-              key={value}
-              sx={{ flex: 1, minHeight: 0, minWidth: 0, display: view === value ? 'flex' : 'none' }}
-            >
-              <Suspense
-                fallback={
-                  <Box sx={{ flex: 1, display: 'grid', placeItems: 'center' }}>
-                    <CircularProgress />
-                  </Box>
-                }
+        <Box
+          sx={{
+            height: `calc(100dvh - ${APPBAR_HEIGHT}px)`,
+            minHeight: 420,
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          {ROUTES.filter((r) => visited.has(r.view)).map(({ view: value }) => {
+            const { Component } = VIEWS[value];
+            return (
+              <Box
+                key={value}
+                sx={{
+                  flex: 1,
+                  minHeight: 0,
+                  minWidth: 0,
+                  display: view === value ? 'flex' : 'none',
+                }}
               >
-                <Component />
-              </Suspense>
-            </Box>
-          );
-        })}
-        {view === null && <NotFound onOpen={open} />}
+                <Suspense
+                  fallback={
+                    <Box sx={{ flex: 1, display: 'grid', placeItems: 'center' }}>
+                      <CircularProgress />
+                    </Box>
+                  }
+                >
+                  <Component />
+                </Suspense>
+              </Box>
+            );
+          })}
+          {view === null && <NotFound onOpen={open} />}
+        </Box>
+        {content && <ToolInfo content={content} />}
       </Box>
       <SupportCard />
     </ThemeProvider>
