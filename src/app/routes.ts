@@ -36,9 +36,9 @@ export const ROUTES: Route[] = [
     view: 'crashlytics',
     path: '/crashlytics',
     label: 'Crashlytics',
-    title: 'Formateador de stack traces',
+    title: 'Formatear stack traces de Android y Crashlytics',
     description:
-      'Ordena la indentación de un stack trace de Android y colorea cada frame según su origen: tu app, Android, Java/Kotlin o librerías.',
+      'Pega un stack trace de Crashlytics o Logcat: lo reindenta, agrupa frames repetidos y resalta las clases de tu app frente a Android, Java/Kotlin y librerías.',
     category: 'depurar',
   },
   {
