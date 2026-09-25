@@ -1,10 +1,11 @@
-export type View = 'jsoncleaner' | 'crashlytics' | 'models' | 'swagger' | 'jwt';
+export type View = 'jsoncleaner' | 'crashlytics' | 'models' | 'swagger' | 'jwt' | 'encode';
 
-export type Category = 'datos' | 'depurar';
+export type Category = 'datos' | 'depurar' | 'codificar';
 
 export const CATEGORIES: { id: Category; label: string }[] = [
   { id: 'datos', label: 'Datos' },
   { id: 'depurar', label: 'Depurar' },
+  { id: 'codificar', label: 'Codificar' },
 ];
 
 export interface Route {
@@ -65,6 +66,15 @@ export const ROUTES: Route[] = [
     description:
       'Decodifica el header y el payload de un JSON Web Token, revisa si ya expiró, detecta claims sensibles y verifica la firma. El token nunca sale de tu navegador.',
     category: 'depurar',
+  },
+  {
+    view: 'encode',
+    path: '/base64',
+    label: 'Base64 / URL',
+    title: 'Codificar y decodificar Base64 y URL',
+    description:
+      'Codifica y decodifica texto en Base64, Base64URL y codificación de URL (porcentaje), con soporte completo de acentos y emoji. Todo en tu navegador.',
+    category: 'codificar',
   },
 ];
 
