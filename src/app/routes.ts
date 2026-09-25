@@ -1,11 +1,13 @@
-export type View = 'jsoncleaner' | 'crashlytics' | 'models' | 'swagger' | 'jwt' | 'encode';
+export type View =
+  'jsoncleaner' | 'crashlytics' | 'models' | 'swagger' | 'jwt' | 'encode' | 'vectorize';
 
-export type Category = 'datos' | 'depurar' | 'codificar';
+export type Category = 'datos' | 'depurar' | 'codificar' | 'imagenes';
 
 export const CATEGORIES: { id: Category; label: string }[] = [
   { id: 'datos', label: 'Datos' },
   { id: 'depurar', label: 'Depurar' },
   { id: 'codificar', label: 'Codificar' },
+  { id: 'imagenes', label: 'Imágenes' },
 ];
 
 export interface Route {
@@ -75,6 +77,15 @@ export const ROUTES: Route[] = [
     description:
       'Codifica y decodifica texto en Base64, Base64URL y codificación de URL (porcentaje), con soporte completo de acentos y emoji. Todo en tu navegador.',
     category: 'codificar',
+  },
+  {
+    view: 'vectorize',
+    path: '/imagen-a-svg',
+    label: 'Imagen a SVG',
+    title: 'Convertir imagen a SVG (vectorizar PNG y JPG)',
+    description:
+      'Convierte PNG, JPG o WebP a SVG vectorial en tu navegador, ideal para logos e íconos. Ajusta colores y detalle, compara y descarga el SVG.',
+    category: 'imagenes',
   },
 ];
 

@@ -1,0 +1,36 @@
+.vectorize-preview {
+  flex: 1;
+  min-height: 160px;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.vectorize-preview img {
+  max-width: 100%;
+  max-height: 100%;
+  min-height: 0;
+  object-fit: contain;
+}
+.vectorize-drop {
+  flex: 1;
+  margin: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+  color: var(--mui-palette-text-primary);
+  font: inherit;
+  background: none;
+  border: 2px dashed var(--mui-palette-divider);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.vectorize-drop:hover,
+.vectorize-drop:focus-visible {
+  border-color: var(--mui-palette-primary-main);
+}

@@ -111,6 +111,57 @@ export const TOOL_CONTENT: Partial<Record<View, ToolContent>> = {
       },
     ],
   },
+  vectorize: {
+    h1: 'Convertir imagen a SVG online',
+    intro: [
+      'Arrastra, pega o carga un PNG, JPG o WebP y Depura lo convierte en un SVG vectorial: formas de verdad que se ven nítidas a cualquier tamaño, no una imagen metida dentro de un SVG.',
+      'La conversión se hace en tu navegador: la imagen no se sube a ningún servidor.',
+    ],
+    features: [
+      {
+        title: 'Pensado para logos e íconos',
+        text: 'El modo Logo reduce la imagen a pocos colores con curvas limpias, justo lo que necesitas para un favicon, un ícono o un logo escalable.',
+      },
+      {
+        title: 'Blanco y negro',
+        text: 'Convierte firmas, dibujos a línea y texto escaneado en un SVG de dos colores.',
+      },
+      {
+        title: 'Ajusta el resultado',
+        text: 'Elige cuántos colores usar, ignora manchas pequeñas para quitar ruido, suaviza bordes o quita el fondo.',
+      },
+      {
+        title: 'Compara antes de descargar',
+        text: 'Ves la imagen original y el SVG lado a lado, con el tamaño del archivo y el número de formas.',
+      },
+      {
+        title: 'Descarga o copia el código',
+        text: 'Descarga el .svg o copia su código para pegarlo en HTML, en Figma o en un proyecto de Android.',
+      },
+      {
+        title: 'Sin instalar nada',
+        text: 'Funciona en cualquier navegador moderno, también en el móvil, y no necesita cuenta.',
+      },
+    ],
+    faq: [
+      {
+        q: '¿Qué imágenes quedan bien en SVG?',
+        a: 'Las que tienen pocos colores y bordes definidos: logos, íconos, ilustraciones planas, firmas y dibujos. Las fotos, degradados y sombras generan miles de formas y un archivo pesado; para esas es mejor quedarse con PNG, JPG o WebP.',
+      },
+      {
+        q: '¿Mi imagen se sube a algún servidor?',
+        a: 'No. La imagen se lee y se vectoriza dentro de tu navegador; no sale de tu equipo.',
+      },
+      {
+        q: '¿Por qué mi SVG pesa tanto?',
+        a: 'Cada zona de color distinta se convierte en una forma. Baja el número de colores, sube «Ignorar manchas» o activa «Suavizar» para obtener menos formas y un archivo más ligero.',
+      },
+      {
+        q: '¿Hay un límite de tamaño?',
+        a: 'Las imágenes más grandes de 1024 px por lado se reducen a ese tamaño antes de vectorizar. Como el resultado es vectorial, después puedes escalarlo sin perder nitidez.',
+      },
+    ],
+  },
 };
 
 export function jsonLdFor(route: Route): object {

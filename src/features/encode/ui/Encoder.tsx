@@ -28,6 +28,7 @@ import { downloadBytes } from '../../../shared/lib/download';
 import { track } from '../../../shared/lib/analytics';
 import { bytesToBase64, detectFileType, encodeFile, fileTooLarge, runCodec } from '../model/encode';
 import type { Direction, EncodeMode, FileInfo } from '../model/encode';
+import '../../../shared/ui/styles/checkerboard.css';
 import './encode.css';
 
 const MODES: { value: EncodeMode; label: string; hint: string }[] = [
@@ -86,7 +87,7 @@ function FilePreview({
   return (
     <Stack sx={{ flex: 1, minHeight: 0, p: 2, gap: 1.5, overflow: 'auto' }}>
       {src ? (
-        <Box className="encode-preview">
+        <Box className="encode-preview checkerboard">
           <img src={src} alt={title} />
         </Box>
       ) : (

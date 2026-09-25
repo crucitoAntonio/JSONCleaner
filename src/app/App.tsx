@@ -17,17 +17,15 @@ import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import DataObjectIcon from '@mui/icons-material/DataObject';
 import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
+import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import PolylineOutlinedIcon from '@mui/icons-material/PolylineOutlined';
 import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import SettingsBrightnessOutlinedIcon from '@mui/icons-material/SettingsBrightnessOutlined';
 import { JsonCleaner } from '../features/json-cleaner';
-import { Crashlytics } from '../features/crashlytics';
-import { SwaggerEditor } from '../features/swagger';
 import { SupportCard } from '../features/support';
-import { JwtDebugger } from '../features/jwt';
-import { Encoder } from '../features/encode';
 import { track } from '../shared/lib/analytics';
 import { THEME_STORAGE_KEY, theme } from './theme';
 import { ROUTES, SITE_NAME, pageTitle, routeFor } from './routes';
@@ -37,9 +35,19 @@ import { useRoute } from './useRoute';
 import { TOOL_CONTENT } from './seo';
 import { ToolInfo } from './ToolInfo';
 
-// quicktype pesa ~1 MB: el generador de modelos se descarga solo al abrir su pestaña.
+const Crashlytics = lazy(() =>
+  import('../features/crashlytics').then((m) => ({ default: m.Crashlytics })),
+);
 const ModelGenerator = lazy(() =>
   import('../features/codegen').then((m) => ({ default: m.ModelGenerator })),
+);
+const SwaggerEditor = lazy(() =>
+  import('../features/swagger').then((m) => ({ default: m.SwaggerEditor })),
+);
+const JwtDebugger = lazy(() => import('../features/jwt').then((m) => ({ default: m.JwtDebugger })));
+const Encoder = lazy(() => import('../features/encode').then((m) => ({ default: m.Encoder })));
+const ImageToSvg = lazy(() =>
+  import('../features/vectorize').then((m) => ({ default: m.ImageToSvg })),
 );
 
 const VIEWS: Record<View, { icon: ReactElement; Component: ComponentType }> = {
@@ -49,6 +57,7 @@ const VIEWS: Record<View, { icon: ReactElement; Component: ComponentType }> = {
   swagger: { icon: <ApiIcon fontSize="small" />, Component: SwaggerEditor },
   jwt: { icon: <KeyOutlinedIcon fontSize="small" />, Component: JwtDebugger },
   encode: { icon: <SwapHorizIcon fontSize="small" />, Component: Encoder },
+  vectorize: { icon: <PolylineOutlinedIcon fontSize="small" />, Component: ImageToSvg },
 };
 
 const APPBAR_HEIGHT = 57;
@@ -61,6 +70,7 @@ const CATEGORY_ICONS: Record<Category, ReactElement> = {
   datos: <StorageOutlinedIcon fontSize="small" />,
   depurar: <BugReportOutlinedIcon fontSize="small" />,
   codificar: <LockOutlinedIcon fontSize="small" />,
+  imagenes: <ImageOutlinedIcon fontSize="small" />,
 };
 
 function NotFound({ onOpen }: { onOpen: (route: Route) => void }) {

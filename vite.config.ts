@@ -104,7 +104,13 @@ function routePages(): Plugin {
         fileName: 'staticwebapp.config.json',
         source: JSON.stringify(
           {
-            routes: ROUTES.map((r) => ({ route: r.path, rewrite: `${r.path}/index.html` })),
+            routes: [
+              {
+                route: '/assets/*',
+                headers: { 'cache-control': 'public, max-age=31536000, immutable' },
+              },
+              ...ROUTES.map((r) => ({ route: r.path, rewrite: `${r.path}/index.html` })),
+            ],
             navigationFallback: {
               rewrite: '/index.html',
               exclude: ['/assets/*', '/sitemap.xml', '/robots.txt', '/*.{png,jpg,svg,ico}'],
