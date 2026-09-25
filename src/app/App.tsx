@@ -1,12 +1,10 @@
 import { Suspense, lazy, useEffect } from 'react';
-import type { ComponentType, MouseEvent, ReactElement } from 'react';
+import type { ComponentType, ReactElement } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import CssBaseline from '@mui/material/CssBaseline';
 import Link from '@mui/material/Link';
-import Tab from '@mui/material/Tab';
-import Tabs from '@mui/material/Tabs';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Toolbar from '@mui/material/Toolbar';
@@ -18,16 +16,20 @@ import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import DataObjectIcon from '@mui/icons-material/DataObject';
+import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
+import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import SettingsBrightnessOutlinedIcon from '@mui/icons-material/SettingsBrightnessOutlined';
 import { JsonCleaner } from '../features/json-cleaner';
 import { Crashlytics } from '../features/crashlytics';
 import { SwaggerEditor } from '../features/swagger';
 import { SupportCard } from '../features/support';
+import { JwtDebugger } from '../features/jwt';
 import { track } from '../shared/lib/analytics';
 import { THEME_STORAGE_KEY, theme } from './theme';
 import { ROUTES, SITE_NAME, pageTitle, routeFor } from './routes';
-import type { Route, View } from './routes';
+import type { Category, Route, View } from './routes';
+import { Nav, isPlainClick } from './Nav';
 import { useRoute } from './useRoute';
 
 // quicktype pesa ~1 MB: el generador de modelos se descarga solo al abrir su pestaña.
@@ -40,11 +42,17 @@ const VIEWS: Record<View, { icon: ReactElement; Component: ComponentType }> = {
   crashlytics: { icon: <BugReportOutlinedIcon fontSize="small" />, Component: Crashlytics },
   models: { icon: <ClassOutlinedIcon fontSize="small" />, Component: ModelGenerator },
   swagger: { icon: <ApiIcon fontSize="small" />, Component: SwaggerEditor },
+  jwt: { icon: <KeyOutlinedIcon fontSize="small" />, Component: JwtDebugger },
 };
 
-function isPlainClick(e: MouseEvent<HTMLElement>): boolean {
-  return e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
-}
+const VIEW_ICONS = Object.fromEntries(
+  Object.entries(VIEWS).map(([v, { icon }]) => [v, icon]),
+) as Record<View, ReactElement>;
+
+const CATEGORY_ICONS: Record<Category, ReactElement> = {
+  datos: <StorageOutlinedIcon fontSize="small" />,
+  depurar: <BugReportOutlinedIcon fontSize="small" />,
+};
 
 function NotFound({ onOpen }: { onOpen: (route: Route) => void }) {
   return (
@@ -155,39 +163,7 @@ export function App() {
                 {SITE_NAME}
               </Typography>
             </Box>
-            <Tabs
-              value={view ?? false}
-              sx={{
-                flex: 1,
-                minWidth: 0,
-                minHeight: 56,
-                '& .MuiTab-root': { minHeight: 56, textTransform: 'none', fontWeight: 600 },
-              }}
-              variant="scrollable"
-              scrollButtons={false}
-            >
-              {ROUTES.map((r) => (
-                <Tab
-                  key={r.view}
-                  value={r.view}
-                  component="a"
-                  href={r.path}
-                  onClick={(e: MouseEvent<HTMLAnchorElement>) => {
-                    if (!isPlainClick(e)) return;
-                    e.preventDefault();
-                    if (r.view !== view) open(r);
-                  }}
-                  icon={VIEWS[r.view].icon}
-                  iconPosition="start"
-                  label={
-                    <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                      {r.label}
-                    </Box>
-                  }
-                  aria-label={r.label}
-                />
-              ))}
-            </Tabs>
+            <Nav view={view} onOpen={open} viewIcons={VIEW_ICONS} categoryIcons={CATEGORY_ICONS} />
             <ThemeSwitch />
           </Toolbar>
         </AppBar>

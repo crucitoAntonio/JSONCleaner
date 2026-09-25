@@ -1,8 +1,8 @@
 import react from '@vitejs/plugin-react';
 import type { Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
-import { HOME_VIEW, ROUTES, SITE_URL, pageTitle, routeFor } from './src/app/routes';
-import type { Route } from './src/app/routes';
+import { HOME_VIEW, ROUTES, SITE_URL, pageTitle, routeFor } from './src/app/routes.ts';
+import type { Route } from './src/app/routes.ts';
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

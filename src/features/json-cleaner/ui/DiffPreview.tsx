@@ -4,7 +4,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import type { LineOp } from '../model/diff-lines';
-import { syntaxHighlightText } from '../model/highlight';
+import { syntaxHighlightText } from '../../../shared/lib/highlight-json';
 
 interface DiffPreviewProps {
   /** null cuando diffLines abortó por tamaño. */

@@ -35,6 +35,8 @@ export default tseslint.config(
                 '**/features/swagger/ui/*',
                 '**/features/support/model/*',
                 '**/features/support/ui/*',
+                '**/features/jwt/model/*',
+                '**/features/jwt/ui/*',
               ],
               message:
                 'Importa solo desde el index.ts público de la feature, no de sus archivos internos.',
