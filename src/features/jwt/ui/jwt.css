@@ -1,0 +1,24 @@
+.jwt-h {
+  color: var(--syn-bool);
+}
+.jwt-p {
+  color: var(--trace-lib);
+}
+.jwt-s {
+  color: var(--syn-key);
+}
+.jwt-dot {
+  color: var(--mui-palette-text-primary);
+  font-weight: 700;
+}
+.jwt-pre {
+  margin: 0;
+  padding: 12px;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border-radius: 6px;
+  background: var(--mui-palette-action-hover);
+}

@@ -37,7 +37,7 @@ import { downloadText } from '../../../shared/lib/download';
 import { slugify } from '../../../shared/lib/format';
 import type { DiffNode } from '../model/diff';
 import type { LineOp } from '../model/diff-lines';
-import { syntaxHighlightText } from '../model/highlight';
+import { syntaxHighlightText } from '../../../shared/lib/highlight-json';
 import type { PanelParse } from '../model/panel-parse';
 import { runQuery } from '../model/query';
 import { matchSecret } from '../model/secret';

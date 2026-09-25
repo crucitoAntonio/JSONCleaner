@@ -1,0 +1,4 @@
+export const SAMPLE_TOKEN =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwbGF5ZXItNDIiLCJuYW1lIjoiUGl4ZWwgUXVlc3QiLCJpc3MiOiJjb20ucGl4ZWxxdWVzdC5nYW1lIiwicm9sZSI6InRlc3RlciIsImlhdCI6MTc2NzIyNTYwMCwiZXhwIjo0MTAyNDQ0ODAwfQ.1yKtEg-FR0cX58t4pDBj8wotsManeSllyz2JC3owkSc';
+
+export const SAMPLE_SECRET = 'pixelquest-secret';

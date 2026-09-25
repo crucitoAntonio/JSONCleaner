@@ -1,6 +1,11 @@
-export type View = 'jsoncleaner' | 'crashlytics' | 'models' | 'swagger';
+export type View = 'jsoncleaner' | 'crashlytics' | 'models' | 'swagger' | 'jwt';
 
 export type Category = 'datos' | 'depurar';
+
+export const CATEGORIES: { id: Category; label: string }[] = [
+  { id: 'datos', label: 'Datos' },
+  { id: 'depurar', label: 'Depurar' },
+];
 
 export interface Route {
   view: View;
@@ -9,6 +14,7 @@ export interface Route {
   title: string;
   description: string;
   category: Category;
+  featured?: boolean;
 }
 
 export const SITE_NAME = 'Depura';
@@ -23,6 +29,7 @@ export const ROUTES: Route[] = [
     description:
       'Limpia JSON pegado desde Logcat, dale formato, míralo como árbol o tabla y compara dos documentos lado a lado. Todo en tu navegador.',
     category: 'datos',
+    featured: true,
   },
   {
     view: 'crashlytics',
@@ -49,6 +56,15 @@ export const ROUTES: Route[] = [
     title: 'Editor de Swagger / OpenAPI',
     description: 'Edita y valida especificaciones OpenAPI con el Swagger Editor oficial.',
     category: 'datos',
+  },
+  {
+    view: 'jwt',
+    path: '/jwt',
+    label: 'JWT',
+    title: 'Decodificador y verificador de JWT',
+    description:
+      'Decodifica el header y el payload de un JSON Web Token, revisa si ya expiró, detecta claims sensibles y verifica la firma. El token nunca sale de tu navegador.',
+    category: 'depurar',
   },
 ];
 
