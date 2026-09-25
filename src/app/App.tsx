@@ -1,9 +1,10 @@
-import { Suspense, lazy, useState } from 'react';
-import type { ComponentType, ReactElement } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
+import type { ComponentType, MouseEvent, ReactElement } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import CssBaseline from '@mui/material/CssBaseline';
+import Link from '@mui/material/Link';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import ToggleButton from '@mui/material/ToggleButton';
@@ -25,40 +26,56 @@ import { SwaggerEditor } from '../features/swagger';
 import { SupportCard } from '../features/support';
 import { track } from '../shared/lib/analytics';
 import { THEME_STORAGE_KEY, theme } from './theme';
+import { ROUTES, SITE_NAME, pageTitle, routeFor } from './routes';
+import type { Route, View } from './routes';
+import { useRoute } from './useRoute';
 
 // quicktype pesa ~1 MB: el generador de modelos se descarga solo al abrir su pestaña.
 const ModelGenerator = lazy(() =>
   import('../features/codegen').then((m) => ({ default: m.ModelGenerator })),
 );
 
-type View = 'jsoncleaner' | 'crashlytics' | 'models' | 'swagger';
+const VIEWS: Record<View, { icon: ReactElement; Component: ComponentType }> = {
+  jsoncleaner: { icon: <DataObjectIcon fontSize="small" />, Component: JsonCleaner },
+  crashlytics: { icon: <BugReportOutlinedIcon fontSize="small" />, Component: Crashlytics },
+  models: { icon: <ClassOutlinedIcon fontSize="small" />, Component: ModelGenerator },
+  swagger: { icon: <ApiIcon fontSize="small" />, Component: SwaggerEditor },
+};
 
-const VIEWS: { value: View; label: string; icon: ReactElement; Component: ComponentType }[] = [
-  {
-    value: 'jsoncleaner',
-    label: 'JSON Cleaner',
-    icon: <DataObjectIcon fontSize="small" />,
-    Component: JsonCleaner,
-  },
-  {
-    value: 'crashlytics',
-    label: 'Crashlytics',
-    icon: <BugReportOutlinedIcon fontSize="small" />,
-    Component: Crashlytics,
-  },
-  {
-    value: 'models',
-    label: 'Modelos',
-    icon: <ClassOutlinedIcon fontSize="small" />,
-    Component: ModelGenerator,
-  },
-  {
-    value: 'swagger',
-    label: 'Swagger',
-    icon: <ApiIcon fontSize="small" />,
-    Component: SwaggerEditor,
-  },
-];
+function isPlainClick(e: MouseEvent<HTMLElement>): boolean {
+  return e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
+}
+
+function NotFound({ onOpen }: { onOpen: (route: Route) => void }) {
+  return (
+    <Box sx={{ flex: 1, display: 'grid', placeItems: 'center', p: 3 }}>
+      <Box sx={{ textAlign: 'center' }}>
+        <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
+          Página no encontrada
+        </Typography>
+        <Typography color="text.secondary" sx={{ mb: 2 }}>
+          Esa dirección no existe. Estas son las herramientas:
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'center' }}>
+          {ROUTES.map((r) => (
+            <Link
+              key={r.view}
+              href={r.path}
+              onClick={(e) => {
+                if (!isPlainClick(e)) return;
+                e.preventDefault();
+                onOpen(r);
+              }}
+            >
+              {r.label}
+            </Link>
+          ))}
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+
 type Mode = 'light' | 'system' | 'dark';
 
 const MODES: { value: Mode; label: string; icon: React.ReactNode }[] = [
@@ -94,13 +111,15 @@ function ThemeSwitch() {
 }
 
 export function App() {
-  const [view, setView] = useState<View>('jsoncleaner');
-  const [visited, setVisited] = useState<Set<View>>(() => new Set(['jsoncleaner']));
-  const open = (v: View) => {
-    setView(v);
-    track('tab_open', { tab: v });
-    setVisited((s) => (s.has(v) ? s : new Set(s).add(v)));
+  const { view, visited, navigate } = useRoute();
+  const open = (route: Route) => {
+    navigate(route.path);
+    track('tab_open', { tab: route.view });
   };
+
+  useEffect(() => {
+    document.title = view ? pageTitle(routeFor(view)) : `Página no encontrada · ${SITE_NAME}`;
+  }, [view]);
 
   return (
     <ThemeProvider theme={theme} modeStorageKey={THEME_STORAGE_KEY} defaultMode="system">
@@ -133,12 +152,11 @@ export function App() {
               <Typography
                 sx={{ fontWeight: 700, whiteSpace: 'nowrap', display: { xs: 'none', md: 'block' } }}
               >
-                JSON Log Cleaner
+                {SITE_NAME}
               </Typography>
             </Box>
             <Tabs
-              value={view}
-              onChange={(_, v: View) => open(v)}
+              value={view ?? false}
               sx={{
                 flex: 1,
                 minWidth: 0,
@@ -148,18 +166,25 @@ export function App() {
               variant="scrollable"
               scrollButtons={false}
             >
-              {VIEWS.map((v) => (
+              {ROUTES.map((r) => (
                 <Tab
-                  key={v.value}
-                  value={v.value}
-                  icon={v.icon}
+                  key={r.view}
+                  value={r.view}
+                  component="a"
+                  href={r.path}
+                  onClick={(e: MouseEvent<HTMLAnchorElement>) => {
+                    if (!isPlainClick(e)) return;
+                    e.preventDefault();
+                    if (r.view !== view) open(r);
+                  }}
+                  icon={VIEWS[r.view].icon}
                   iconPosition="start"
                   label={
                     <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                      {v.label}
+                      {r.label}
                     </Box>
                   }
-                  aria-label={v.label}
+                  aria-label={r.label}
                 />
               ))}
             </Tabs>
@@ -170,22 +195,26 @@ export function App() {
         {/* Cada vista se monta la primera vez que se abre y luego queda montada (oculta):
             cambiar de pestaña no pierde el texto pegado, y Swagger/Modelos no cargan nada
             hasta que se usan. */}
-        {VIEWS.filter((v) => visited.has(v.value)).map(({ value, Component }) => (
-          <Box
-            key={value}
-            sx={{ flex: 1, minHeight: 0, minWidth: 0, display: view === value ? 'flex' : 'none' }}
-          >
-            <Suspense
-              fallback={
-                <Box sx={{ flex: 1, display: 'grid', placeItems: 'center' }}>
-                  <CircularProgress />
-                </Box>
-              }
+        {ROUTES.filter((r) => visited.has(r.view)).map(({ view: value }) => {
+          const { Component } = VIEWS[value];
+          return (
+            <Box
+              key={value}
+              sx={{ flex: 1, minHeight: 0, minWidth: 0, display: view === value ? 'flex' : 'none' }}
             >
-              <Component />
-            </Suspense>
-          </Box>
-        ))}
+              <Suspense
+                fallback={
+                  <Box sx={{ flex: 1, display: 'grid', placeItems: 'center' }}>
+                    <CircularProgress />
+                  </Box>
+                }
+              >
+                <Component />
+              </Suspense>
+            </Box>
+          );
+        })}
+        {view === null && <NotFound onOpen={open} />}
       </Box>
       <SupportCard />
     </ThemeProvider>
