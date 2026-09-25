@@ -173,7 +173,7 @@ export function Crashlytics() {
             value={trace}
             onChange={setTrace}
             highlight={highlight}
-            placeholder="Pega aquí la traza de Crashlytics..."
+            placeholder="Pega aquí la traza de Crashlytics o Logcat (con o sin prefijos)..."
             ariaLabel="Traza de excepción"
           />
         </Card>

@@ -1,3 +1,4 @@
+import { isLogSeparator, stripLogPrefix } from '../../../shared/lib/logcat';
 import { TRACE_CYCLE, TRACE_FRAME, TRACE_MORE, TRACE_REPEAT_SUFFIX } from './tokenizer';
 
 interface TraceLine {
@@ -37,8 +38,8 @@ function sameLine(a: TraceItem | undefined, b: TraceItem | undefined): boolean {
 function readItems(text: string): TraceItem[] {
   const rawLines = text
     .split(/\r?\n/)
-    .map((l) => l.trim())
-    .filter((l) => l.length > 0);
+    .map((l) => stripLogPrefix(l).trim())
+    .filter((l) => l.length > 0 && !isLogSeparator(l));
   const items: TraceItem[] = [];
   let cycle: { item: TraceCycle; remaining: number } | null = null;
 

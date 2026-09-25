@@ -1,16 +1,7 @@
 // Extrae JSON válido de logs pegados desde Logcat (formato breve o `-v threadtime`),
 // tolerando prefijos de línea y JSON "envuelto" en texto de log.
 
-const LOGCAT_PREFIX =
-  /^\s*\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{3}\s+\d+-\d+\s+\S+\s+\S+\s+[VDIWEFS]\s{2,}/;
-const LOGCAT_THREADTIME =
-  /^\s*\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{3}\s+\d+\s+\d+\s+[VDIWEFS]\s+\S+:\s*/;
-
-export function stripLogPrefix(line: string): string {
-  if (LOGCAT_PREFIX.test(line)) return line.replace(LOGCAT_PREFIX, '');
-  if (LOGCAT_THREADTIME.test(line)) return line.replace(LOGCAT_THREADTIME, '');
-  return line;
-}
+import { stripLogPrefix } from '../../../shared/lib/logcat';
 
 export function findJsonSubstring(text: string): string {
   let start = -1;

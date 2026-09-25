@@ -1,6 +1,7 @@
 import { jsonrepair } from 'jsonrepair';
 import type { JsonValue } from '../../../shared/types';
-import { extractJsonText, findJsonSubstring, fixDoubledQuotes, stripLogPrefix } from './parser';
+import { stripLogPrefix } from '../../../shared/lib/logcat';
+import { extractJsonText, findJsonSubstring, fixDoubledQuotes } from './parser';
 
 export type StatusKind = 'ok' | 'err' | 'idle';
 
