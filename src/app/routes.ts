@@ -26,9 +26,9 @@ export const ROUTES: Route[] = [
     view: 'jsoncleaner',
     path: '/json',
     label: 'JSON Cleaner',
-    title: 'Limpiador y comparador de JSON',
+    title: 'Formatear, validar y comparar JSON online',
     description:
-      'Limpia JSON pegado desde Logcat, dale formato, míralo como árbol o tabla y compara dos documentos lado a lado. Todo en tu navegador.',
+      'Formatea, valida y compara JSON gratis. Limpia JSON pegado desde Logcat o adb, míralo como árbol o tabla y consúltalo con JSONPath. Todo en tu navegador.',
     category: 'datos',
     featured: true,
   },
