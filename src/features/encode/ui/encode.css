@@ -1,0 +1,13 @@
+.encode-output {
+  flex: 1;
+  min-height: 80px;
+  margin: 0;
+  padding: 14px 16px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: auto;
+  user-select: text;
+}

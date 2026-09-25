@@ -17,7 +17,9 @@ import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import DataObjectIcon from '@mui/icons-material/DataObject';
 import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import SettingsBrightnessOutlinedIcon from '@mui/icons-material/SettingsBrightnessOutlined';
 import { JsonCleaner } from '../features/json-cleaner';
@@ -25,6 +27,7 @@ import { Crashlytics } from '../features/crashlytics';
 import { SwaggerEditor } from '../features/swagger';
 import { SupportCard } from '../features/support';
 import { JwtDebugger } from '../features/jwt';
+import { Encoder } from '../features/encode';
 import { track } from '../shared/lib/analytics';
 import { THEME_STORAGE_KEY, theme } from './theme';
 import { ROUTES, SITE_NAME, pageTitle, routeFor } from './routes';
@@ -43,6 +46,7 @@ const VIEWS: Record<View, { icon: ReactElement; Component: ComponentType }> = {
   models: { icon: <ClassOutlinedIcon fontSize="small" />, Component: ModelGenerator },
   swagger: { icon: <ApiIcon fontSize="small" />, Component: SwaggerEditor },
   jwt: { icon: <KeyOutlinedIcon fontSize="small" />, Component: JwtDebugger },
+  encode: { icon: <SwapHorizIcon fontSize="small" />, Component: Encoder },
 };
 
 const VIEW_ICONS = Object.fromEntries(
@@ -52,6 +56,7 @@ const VIEW_ICONS = Object.fromEntries(
 const CATEGORY_ICONS: Record<Category, ReactElement> = {
   datos: <StorageOutlinedIcon fontSize="small" />,
   depurar: <BugReportOutlinedIcon fontSize="small" />,
+  codificar: <LockOutlinedIcon fontSize="small" />,
 };
 
 function NotFound({ onOpen }: { onOpen: (route: Route) => void }) {

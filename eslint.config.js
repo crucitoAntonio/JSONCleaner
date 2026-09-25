@@ -37,6 +37,8 @@ export default tseslint.config(
                 '**/features/support/ui/*',
                 '**/features/jwt/model/*',
                 '**/features/jwt/ui/*',
+                '**/features/encode/model/*',
+                '**/features/encode/ui/*',
               ],
               message:
                 'Importa solo desde el index.ts público de la feature, no de sus archivos internos.',
