@@ -2,6 +2,8 @@ import { readJson } from '../../../shared/lib/storage';
 
 export const SUPPORT_KEY = 'jsonCleaner.support.v1';
 export const KOFI_URL = 'https://ko-fi.com/N8W327KI3Y';
+export const KOFI_PROBE_URL = 'https://ko-fi.com/favicon.png';
+export const PROBE_TIMEOUT_MS = 8_000;
 
 export const FIRST_SHOW_DELAY_MS = 30_000;
 export const DISMISS_MS = 5 * 60_000;

@@ -11,8 +11,11 @@ import CloseIcon from '@mui/icons-material/Close';
 import LocalCafeOutlinedIcon from '@mui/icons-material/LocalCafeOutlined';
 import { track } from '../../../shared/lib/analytics';
 import type { HideReason } from '../model/timing';
+import { probeImage } from './probe';
 import {
+  KOFI_PROBE_URL,
   KOFI_URL,
+  PROBE_TIMEOUT_MS,
   expandDelay,
   goneUntilFor,
   hiddenUntilFor,
@@ -40,6 +43,16 @@ export function showSupportNow(): void {
   window.dispatchEvent(new Event(SHOW_EVENT));
 }
 
+let kofiReachable: Promise<boolean> | null = null;
+
+function checkKofi(): Promise<boolean> {
+  kofiReachable ??= probeImage(KOFI_PROBE_URL, PROBE_TIMEOUT_MS).then((ok) => {
+    if (!ok) track('support_blocked');
+    return ok;
+  });
+  return kofiReachable;
+}
+
 const EDGE = 28;
 
 export function SupportCard() {
@@ -48,9 +61,22 @@ export function SupportCard() {
   );
   const [hiddenUntil, setHiddenUntil] = useState(loadHiddenUntil);
   const [goneUntil, setGoneUntil] = useState(loadGoneUntil);
+  const [reachable, setReachable] = useState<boolean | null>(null);
   const [open, setOpen] = useState(false);
   const [peek, setPeek] = useState(false);
   const expanded = open || peek;
+  const gone = isGone(goneUntil);
+
+  useEffect(() => {
+    if (!unlocked || gone) return;
+    let active = true;
+    checkKofi().then((ok) => {
+      if (active) setReachable(ok);
+    });
+    return () => {
+      active = false;
+    };
+  }, [unlocked, gone]);
 
   useEffect(() => {
     if (!unlocked) return;
@@ -87,7 +113,7 @@ export function SupportCard() {
     if (!e.currentTarget.contains(e.relatedTarget)) setPeek(false);
   };
 
-  if (!unlocked || isGone(goneUntil)) return null;
+  if (!unlocked || gone || !reachable) return null;
 
   return (
     <Paper
