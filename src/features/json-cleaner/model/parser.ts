@@ -51,3 +51,14 @@ export function extractJsonText(raw: string): string {
 export function fixDoubledQuotes(text: string): string {
   return text.replace(/""/g, '"');
 }
+
+const EMBEDDED_MARKER = /objToStrJSON\s*:\s*(?=[{[])/;
+
+export function findEmbeddedJson(text: string): string | null {
+  const m = EMBEDDED_MARKER.exec(text);
+  return m ? findJsonSubstring(text.slice(m.index + m[0].length)) : null;
+}
+
+export function unescapeQuotes(text: string): string {
+  return text.replace(/\\(["\\])/g, '$1');
+}

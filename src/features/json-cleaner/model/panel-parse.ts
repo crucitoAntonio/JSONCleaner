@@ -1,7 +1,50 @@
 import { jsonrepair } from 'jsonrepair';
 import type { JsonValue } from '../../../shared/types';
 import { stripLogPrefix } from '../../../shared/lib/logcat';
-import { extractJsonText, findJsonSubstring, fixDoubledQuotes } from './parser';
+import {
+  extractJsonText,
+  findEmbeddedJson,
+  findJsonSubstring,
+  fixDoubledQuotes,
+  unescapeQuotes,
+} from './parser';
+
+const EMBEDDED_STATUS = 'JSON válido (extraído de objToStrJSON)';
+
+function tryParse(text: string): JsonValue | undefined {
+  try {
+    return JSON.parse(text) as JsonValue;
+  } catch {
+    return undefined;
+  }
+}
+
+function embeddedIn(value: JsonValue): JsonValue | undefined {
+  if (typeof value === 'string') {
+    const inner = findEmbeddedJson(value);
+    return inner === null ? undefined : tryParse(inner);
+  }
+  if (value === null || typeof value !== 'object') return undefined;
+  for (const child of Array.isArray(value) ? value : Object.values(value)) {
+    const found = embeddedIn(child);
+    if (found !== undefined) return found;
+  }
+  return undefined;
+}
+
+function embeddedInRaw(raw: string): JsonValue | undefined {
+  const joined = raw.split(/\r?\n/).map(stripLogPrefix).join('');
+  for (const text of [joined, unescapeQuotes(joined)]) {
+    const inner = findEmbeddedJson(text);
+    const value = inner === null ? undefined : tryParse(inner);
+    if (value !== undefined) return value;
+  }
+  return undefined;
+}
+
+function okResult(parsed: JsonValue, text: string): PanelParse {
+  return { parsed, valid: true, error: null, status: { kind: 'ok', text } };
+}
 
 export type StatusKind = 'ok' | 'err' | 'idle';
 
@@ -25,13 +68,12 @@ export function parsePanelText(raw: string): PanelParse {
   }
   const jsonText = extractJsonText(raw);
   try {
-    return {
-      parsed: JSON.parse(jsonText) as JsonValue,
-      valid: true,
-      error: null,
-      status: { kind: 'ok', text: 'JSON válido' },
-    };
+    const parsed = JSON.parse(jsonText) as JsonValue;
+    const inner = embeddedIn(parsed);
+    return inner !== undefined ? okResult(inner, EMBEDDED_STATUS) : okResult(parsed, 'JSON válido');
   } catch (e) {
+    const inner = embeddedInRaw(raw);
+    if (inner !== undefined) return okResult(inner, EMBEDDED_STATUS);
     const fixedText = fixDoubledQuotes(jsonText);
     if (fixedText !== jsonText) {
       try {
