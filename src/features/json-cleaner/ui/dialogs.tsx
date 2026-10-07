@@ -65,6 +65,8 @@ interface ConfirmDialogProps {
   message: string;
   confirmLabel: string;
   danger?: boolean;
+  secondaryLabel?: string;
+  onSecondary?: () => void;
   onClose: () => void;
   onConfirm: () => void;
 }
@@ -76,6 +78,8 @@ export function ConfirmDialog({
   message,
   confirmLabel,
   danger,
+  secondaryLabel,
+  onSecondary,
   onClose,
   onConfirm,
 }: ConfirmDialogProps) {
@@ -87,6 +91,11 @@ export function ConfirmDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancelar</Button>
+        {secondaryLabel && onSecondary && (
+          <Button onClick={onSecondary} variant="outlined">
+            {secondaryLabel}
+          </Button>
+        )}
         <Button
           onClick={onConfirm}
           variant="contained"

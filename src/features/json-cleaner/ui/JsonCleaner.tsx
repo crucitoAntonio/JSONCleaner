@@ -46,7 +46,8 @@ type DialogState =
   | { kind: 'overwrite'; side: Side; name: string }
   | { kind: 'rename'; doc: SavedDoc }
   | { kind: 'delete'; doc: SavedDoc }
-  | { kind: 'repair'; side: Side; value: JsonValue };
+  | { kind: 'repair'; side: Side; value: JsonValue }
+  | { kind: 'embedded'; side: Side; outer: JsonValue; inner: JsonValue };
 
 interface Toast {
   message: string;
@@ -139,7 +140,13 @@ export function JsonCleaner() {
     track('json_format');
     const result = parsePanelText(text);
     if (result.valid) {
-      update(side, { text: JSON.stringify(result.parsed, null, 2) });
+      const pretty = JSON.stringify(result.parsed, null, 2);
+      if (result.embedded !== undefined && result.parsed !== undefined && text !== pretty) {
+        update(side, { text });
+        openDialog({ kind: 'embedded', side, outer: result.parsed, inner: result.embedded });
+        return;
+      }
+      update(side, { text: pretty });
       return;
     }
     update(side, { text });
@@ -388,6 +395,26 @@ export function JsonCleaner() {
             update(dialog.side, { text: JSON.stringify(dialog.value, null, 2) });
             setDialog(null);
             setToast({ message: 'JSON reparado y formateado', severity: 'success' });
+          }}
+        />
+      )}
+      {dialog?.kind === 'embedded' && (
+        <ConfirmDialog
+          open
+          title="¿Qué JSON quieres?"
+          message={`${panels[dialog.side].name} trae un JSON dentro de objToStrJSON. Puedes quedarte solo con ese JSON, o con el JSON completo del log, donde el mensaje se mantiene como texto.`}
+          confirmLabel="Solo objToStrJSON"
+          secondaryLabel="JSON completo"
+          onClose={() => setDialog(null)}
+          onSecondary={() => {
+            track('json_embedded', { choice: 'outer' });
+            update(dialog.side, { text: JSON.stringify(dialog.outer, null, 2) });
+            setDialog(null);
+          }}
+          onConfirm={() => {
+            track('json_embedded', { choice: 'inner' });
+            update(dialog.side, { text: JSON.stringify(dialog.inner, null, 2) });
+            setDialog(null);
           }}
         />
       )}

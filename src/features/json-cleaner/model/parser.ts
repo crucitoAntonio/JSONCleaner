@@ -36,13 +36,34 @@ export function findJsonSubstring(text: string): string {
   return text.slice(start);
 }
 
-export function extractJsonText(raw: string): string {
-  const lines = raw.split(/\r?\n/);
-  const concatenated = lines
+export function joinLogLines(raw: string): string {
+  return raw
+    .split(/\r?\n/)
     .map(stripLogPrefix)
     .filter((l) => l.length > 0)
     .join('');
-  return findJsonSubstring(concatenated);
+}
+
+export function extractJsonText(raw: string): string {
+  return findJsonSubstring(joinLogLines(raw));
+}
+
+const MAX_CANDIDATES = 20;
+
+export function findParsableJson(text: string): string | null {
+  let tried = 0;
+  for (let i = 0; i < text.length && tried < MAX_CANDIDATES; i++) {
+    if (text[i] !== '{' && text[i] !== '[') continue;
+    tried++;
+    const candidate = findJsonSubstring(text.slice(i));
+    try {
+      JSON.parse(candidate);
+      return candidate;
+    } catch {
+      i += candidate.length - 1;
+    }
+  }
+  return null;
 }
 
 // Algunos logs/exportaciones escapan cada comilla `"` como `""` en vez de `\"`

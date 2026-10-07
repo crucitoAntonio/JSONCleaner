@@ -5,7 +5,9 @@ import {
   extractJsonText,
   findEmbeddedJson,
   findJsonSubstring,
+  findParsableJson,
   fixDoubledQuotes,
+  joinLogLines,
   unescapeQuotes,
 } from './parser';
 
@@ -42,8 +44,15 @@ function embeddedInRaw(raw: string): JsonValue | undefined {
   return undefined;
 }
 
-function okResult(parsed: JsonValue, text: string): PanelParse {
-  return { parsed, valid: true, error: null, status: { kind: 'ok', text } };
+function okResult(parsed: JsonValue, text: string, embedded?: JsonValue): PanelParse {
+  return { parsed, valid: true, error: null, status: { kind: 'ok', text }, embedded };
+}
+
+function withEmbedded(parsed: JsonValue): PanelParse {
+  const inner = embeddedIn(parsed);
+  return inner !== undefined
+    ? okResult(parsed, 'JSON válido (contiene objToStrJSON)', inner)
+    : okResult(parsed, 'JSON válido');
 }
 
 export type StatusKind = 'ok' | 'err' | 'idle';
@@ -53,6 +62,7 @@ export interface PanelParse {
   valid: boolean;
   error: string | null;
   status: { kind: StatusKind; text: string };
+  embedded?: JsonValue;
 }
 
 // Parseo "leniente en la entrada": quita prefijos de logcat, localiza el primer {...}/[...]
@@ -68,10 +78,10 @@ export function parsePanelText(raw: string): PanelParse {
   }
   const jsonText = extractJsonText(raw);
   try {
-    const parsed = JSON.parse(jsonText) as JsonValue;
-    const inner = embeddedIn(parsed);
-    return inner !== undefined ? okResult(inner, EMBEDDED_STATUS) : okResult(parsed, 'JSON válido');
+    return withEmbedded(JSON.parse(jsonText) as JsonValue);
   } catch (e) {
+    const later = findParsableJson(joinLogLines(raw));
+    if (later !== null) return withEmbedded(JSON.parse(later) as JsonValue);
     const inner = embeddedInRaw(raw);
     if (inner !== undefined) return okResult(inner, EMBEDDED_STATUS);
     const fixedText = fixDoubledQuotes(jsonText);
