@@ -12,6 +12,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { ThemeProvider, useColorScheme } from '@mui/material/styles';
 import ApiIcon from '@mui/icons-material/Api';
+import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
@@ -46,6 +47,9 @@ const SwaggerEditor = lazy(() =>
 );
 const JwtDebugger = lazy(() => import('../features/jwt').then((m) => ({ default: m.JwtDebugger })));
 const Encoder = lazy(() => import('../features/encode').then((m) => ({ default: m.Encoder })));
+const HtmlToMarkdown = lazy(() =>
+  import('../features/markdown').then((m) => ({ default: m.HtmlToMarkdown })),
+);
 const ImageToSvg = lazy(() =>
   import('../features/vectorize').then((m) => ({ default: m.ImageToSvg })),
 );
@@ -57,6 +61,7 @@ const VIEWS: Record<View, { icon: ReactElement; Component: ComponentType }> = {
   swagger: { icon: <ApiIcon fontSize="small" />, Component: SwaggerEditor },
   jwt: { icon: <KeyOutlinedIcon fontSize="small" />, Component: JwtDebugger },
   encode: { icon: <SwapHorizIcon fontSize="small" />, Component: Encoder },
+  markdown: { icon: <ArticleOutlinedIcon fontSize="small" />, Component: HtmlToMarkdown },
   vectorize: { icon: <PolylineOutlinedIcon fontSize="small" />, Component: ImageToSvg },
 };
 

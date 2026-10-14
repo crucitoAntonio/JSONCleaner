@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
-import type { MouseEvent, ReactElement } from 'react';
+import type { DragEvent, MouseEvent, ReactElement } from 'react';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -22,6 +22,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DownloadIcon from '@mui/icons-material/Download';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import SaveIcon from '@mui/icons-material/Save';
@@ -31,7 +33,9 @@ import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import type { Side } from '../../../shared/types';
 import { CodeEditor } from '../../../shared/ui/CodeEditor';
+import type { EditorFind } from '../../../shared/ui/CodeEditor';
 import { track } from '../../../shared/lib/analytics';
+import { findMatches } from '../../../shared/lib/find';
 import { hideSupportForAWeek, showSupportNow } from '../../support';
 import { downloadText } from '../../../shared/lib/download';
 import { slugify } from '../../../shared/lib/format';
@@ -151,12 +155,40 @@ export function DocPanel({
   const queryInput = useRef<HTMLInputElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const [findIndex, setFindIndex] = useState(0);
+  const [findNonce, setFindNonce] = useState(0);
   const letter = side === 'left' ? 'A' : 'B';
   const output = () => (parse.valid ? JSON.stringify(parse.parsed, null, 2) : data.text);
   // La fila de consulta solo ocupa espacio mientras se usa.
   const showSearch = searchOpen || data.query !== '';
 
-  const querying = data.query.trim() !== '' && parse.valid;
+  const isPathQuery = data.query.trim().startsWith('$');
+  const textFind = data.query.trim() !== '' && !isPathQuery;
+  const starts = useMemo(
+    () => (textFind ? findMatches(data.text, data.query) : []),
+    [textFind, data.text, data.query],
+  );
+  const current = starts.length > 0 ? Math.min(findIndex, starts.length - 1) : 0;
+  const find = useMemo<EditorFind | undefined>(
+    () =>
+      textFind
+        ? { starts, length: data.query.length, current, nonce: findNonce }
+        : undefined,
+    [textFind, starts, data.query.length, current, findNonce],
+  );
+  const goToMatch = (delta: number) => {
+    if (starts.length === 0) return;
+    setFindIndex((current + delta + starts.length) % starts.length);
+    setFindNonce((n) => n + 1);
+  };
+  const changeQuery = (query: string) => {
+    setFindIndex(0);
+    setFindNonce((n) => n + 1);
+    onChange({ query });
+  };
+
+  const querying = isPathQuery && parse.valid;
   const query = useMemo(
     () => (querying ? runQuery(parse.parsed!, data.query) : null),
     [querying, parse.parsed, data.query],
@@ -185,6 +217,25 @@ export function DocPanel({
     reader.readAsText(file);
   };
 
+  const hasFiles = (e: DragEvent<HTMLElement>) => e.dataTransfer.types.includes('Files');
+  const onDragOver = (e: DragEvent<HTMLElement>) => {
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+    setDragging(true);
+  };
+  const onDragLeave = (e: DragEvent<HTMLElement>) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDragging(false);
+  };
+  const onDrop = (e: DragEvent<HTMLElement>) => {
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+    setDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    track('json_drop_file');
+    loadFile(file);
+  };
+
   const runMenuAction = (action: MenuAction) => {
     setMenuAnchor(null);
     if (action === 'save') onSave();
@@ -203,6 +254,9 @@ export function DocPanel({
 
   return (
     <Card
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
       onKeyDown={(e) => {
         // ⌘/Ctrl+F dentro del panel abre su consulta; fuera sigue siendo la búsqueda del navegador.
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'f') {
@@ -220,6 +274,9 @@ export function DocPanel({
         display: 'flex',
         flexDirection: 'column',
         boxShadow: 1,
+        outline: dragging ? '2px dashed' : 'none',
+        outlineColor: 'primary.main',
+        outlineOffset: -2,
       }}
     >
       <Stack
@@ -383,19 +440,19 @@ export function DocPanel({
             inputRef={queryInput}
             autoFocus
             value={data.query}
-            onChange={(e) => onChange({ query: e.target.value })}
+            onChange={(e) => changeQuery(e.target.value)}
             onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                goToMatch(e.shiftKey ? -1 : 1);
+                return;
+              }
               if (e.key !== 'Escape') return;
-              // Esc limpia la consulta; con el campo vacío, cierra la fila.
               e.stopPropagation();
               if (data.query) onChange({ query: '' });
               else setSearchOpen(false);
             }}
-            placeholder={
-              parse.valid
-                ? 'Consulta, p. ej. $.players[?(@.level > 10)].name'
-                : 'Pega un JSON válido para consultarlo'
-            }
+            placeholder="Buscar texto, o consulta JSONPath que empiece con $"
             startAdornment={
               <SearchIcon fontSize="small" sx={{ color: 'text.secondary', mr: 0.5 }} />
             }
@@ -410,7 +467,7 @@ export function DocPanel({
               </IconButton>
             }
             inputProps={{
-              'aria-label': 'Consulta JSONPath del documento ' + letter,
+              'aria-label': 'Búsqueda o consulta JSONPath del documento ' + letter,
               spellCheck: false,
             }}
             sx={{
@@ -425,6 +482,27 @@ export function DocPanel({
               '&.Mui-focused': { borderColor: 'primary.main' },
             }}
           />
+          {textFind && (
+            <>
+              <Chip
+                size="small"
+                variant="outlined"
+                label={
+                  starts.length > 0 ? current + 1 + ' / ' + starts.length : 'Sin coincidencias'
+                }
+              />
+              <Action
+                title="Anterior (Shift + Enter)"
+                onClick={() => goToMatch(-1)}
+                icon={<KeyboardArrowUpIcon fontSize="small" />}
+              />
+              <Action
+                title="Siguiente (Enter)"
+                onClick={() => goToMatch(1)}
+                icon={<KeyboardArrowDownIcon fontSize="small" />}
+              />
+            </>
+          )}
           {query?.ok && (
             <>
               <Chip
@@ -481,12 +559,13 @@ export function DocPanel({
               Consulta inválida: {query.error}
             </Alert>
           )
-        ) : data.mode === 'text' ? (
+        ) : data.mode === 'text' || textFind ? (
           <>
             <CodeEditor
               value={data.text}
               onChange={(text) => onChange({ text })}
               highlight={syntaxHighlightText}
+              find={find}
               placeholder={`Pega aquí el log o JSON del Documento ${letter}...`}
               ariaLabel={'Contenido del documento ' + letter}
               onKeyDown={(e) => {

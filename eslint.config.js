@@ -39,6 +39,8 @@ export default tseslint.config(
                 '**/features/jwt/ui/*',
                 '**/features/encode/model/*',
                 '**/features/encode/ui/*',
+                '**/features/markdown/model/*',
+                '**/features/markdown/ui/*',
                 '**/features/vectorize/model/*',
                 '**/features/vectorize/ui/*',
               ],

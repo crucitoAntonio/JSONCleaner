@@ -1,5 +1,12 @@
 export type View =
-  'jsoncleaner' | 'crashlytics' | 'models' | 'swagger' | 'jwt' | 'encode' | 'vectorize';
+  | 'jsoncleaner'
+  | 'crashlytics'
+  | 'models'
+  | 'swagger'
+  | 'jwt'
+  | 'encode'
+  | 'markdown'
+  | 'vectorize';
 
 export type Category = 'datos' | 'depurar' | 'codificar' | 'imagenes';
 
@@ -76,6 +83,15 @@ export const ROUTES: Route[] = [
     title: 'Codificar y decodificar Base64 y URL',
     description:
       'Codifica y decodifica texto en Base64, Base64URL y codificación de URL (porcentaje), con soporte completo de acentos y emoji. Todo en tu navegador.',
+    category: 'codificar',
+  },
+  {
+    view: 'markdown',
+    path: '/html-a-markdown',
+    label: 'HTML a Markdown',
+    title: 'Convertir HTML a Markdown para pegar en una IA',
+    description:
+      'Convierte HTML a Markdown limpio: pega el código, copia desde una web o arrastra un .html. Quita menús y scripts y conserva tablas y listas. Todo en tu navegador.',
     category: 'codificar',
   },
   {
