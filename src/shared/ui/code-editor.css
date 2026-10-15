@@ -19,14 +19,23 @@
   line-height: 1.55;
   white-space: pre-wrap;
   word-wrap: break-word;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: scroll;
   box-sizing: border-box;
   tab-size: 2;
+  hyphens: none;
+  font-variant-ligatures: none;
+  font-kerning: none;
+  font-synthesis: none;
+}
+.editor-stack .highlight-layer .k {
+  font-weight: 400;
 }
 .editor-stack .highlight-layer {
   color: var(--mui-palette-text-primary);
   pointer-events: none;
   user-select: none;
+  scrollbar-color: transparent transparent;
 }
 .editor-stack mark.find {
   color: inherit;
@@ -50,4 +59,52 @@
 }
 .editor-stack textarea::placeholder {
   color: var(--mui-palette-text-secondary);
+}
+.editor-stack .fold-gutter {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+.editor-stack .fold-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 16px;
+}
+.editor-stack .fold-btn {
+  position: absolute;
+  left: 0;
+  width: 16px;
+  height: calc(12.5px * 1.55);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--mui-palette-text-secondary);
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0.4;
+}
+.editor-stack .fold-btn:hover {
+  opacity: 1;
+}
+.editor-stack .fold-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -2px 0 0 -4px;
+  border-style: solid;
+  border-width: 5px 4px 0 4px;
+  border-color: currentColor transparent transparent transparent;
+}
+.editor-stack .fold-btn.folded::before {
+  margin: -4px 0 0 -3px;
+  border-width: 4px 0 4px 5px;
+  border-color: transparent transparent transparent currentColor;
+}
+.editor-stack:focus-within mark.find,
+.editor-stack:focus-within mark.find-cur {
+  background: transparent;
 }

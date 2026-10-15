@@ -6,7 +6,7 @@ export const KOFI_PROBE_URL = 'https://ko-fi.com/favicon.png';
 export const PROBE_TIMEOUT_MS = 8_000;
 
 export const FIRST_SHOW_DELAY_MS = 30_000;
-export const DISMISS_MS = 5 * 60_000;
+export const DISMISS_MS = 2 * 60 * 60_000;
 export const THANKS_MS = 30 * 24 * 60 * 60_000;
 
 const MAX_TIMEOUT_MS = 2_147_483_647;

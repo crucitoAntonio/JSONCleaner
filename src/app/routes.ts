@@ -93,6 +93,7 @@ export const ROUTES: Route[] = [
     description:
       'Convierte HTML a Markdown limpio: pega el código, copia desde una web o arrastra un .html. Quita menús y scripts y conserva tablas y listas. Todo en tu navegador.',
     category: 'codificar',
+    featured: true,
   },
   {
     view: 'vectorize',

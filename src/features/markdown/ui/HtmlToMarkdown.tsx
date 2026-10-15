@@ -10,6 +10,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
 import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
+import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import ClearAllIcon from '@mui/icons-material/ClearAll';
@@ -24,6 +25,8 @@ import { DEFAULT_OPTIONS, htmlToMarkdown, looksLikeHtml } from '../model/html-to
 
 const DISPLAY_MAX = 200_000;
 const ACCEPT = '.html,.htm,.xhtml,.txt';
+const TIDY_HINT =
+  'Convierte los escapes (\\n, \\") en texto real, quita las comillas que envuelven el HTML y junta los saltos de línea sobrantes';
 
 function stamp(): string {
   return String(Date.now());
@@ -43,6 +46,7 @@ export function HtmlToMarkdown() {
   const [html, setHtml] = useState('');
   const [onlyContent, setOnlyContent] = useState(DEFAULT_OPTIONS.onlyContent);
   const [images, setImages] = useState(DEFAULT_OPTIONS.images);
+  const [tidy, setTidy] = useState(true);
   const [dragging, setDragging] = useState(false);
   const [toast, setToast] = useState('');
   const fileInput = useRef<HTMLInputElement>(null);
@@ -50,11 +54,11 @@ export function HtmlToMarkdown() {
   const deferred = useDeferredValue(html);
   const result = useMemo(() => {
     try {
-      return { markdown: htmlToMarkdown(deferred, { onlyContent, images }), error: '' };
+      return { markdown: htmlToMarkdown(deferred, { onlyContent, images, tidy }), error: '' };
     } catch (e) {
       return { markdown: '', error: e instanceof Error ? e.message : 'No se pudo convertir' };
     }
-  }, [deferred, onlyContent, images]);
+  }, [deferred, onlyContent, images, tidy]);
 
   const { markdown, error } = result;
   const shown = markdown.length > DISPLAY_MAX ? markdown.slice(0, DISPLAY_MAX) : markdown;
@@ -119,6 +123,14 @@ export function HtmlToMarkdown() {
           Pega HTML, copia desde una página web o arrastra un archivo .html para obtener Markdown
           listo para pegar en una IA.
         </Typography>
+        <Tooltip title={TIDY_HINT}>
+          <FormControlLabel
+            control={
+              <Switch size="small" checked={tidy} onChange={(e) => setTidy(e.target.checked)} />
+            }
+            label="Quitar escapes y saltos de línea que estorban"
+          />
+        </Tooltip>
         <FormControlLabel
           control={
             <Checkbox
@@ -227,7 +239,11 @@ export function HtmlToMarkdown() {
               <Chip size="small" variant="outlined" label={markdown.length + ' caracteres'} />
             )}
             <Stack direction="row" sx={{ ml: 'auto', gap: 0.25 }}>
-              <ToolButton title="Copiar" icon={<ContentCopyIcon fontSize="small" />} onClick={copy} />
+              <ToolButton
+                title="Copiar"
+                icon={<ContentCopyIcon fontSize="small" />}
+                onClick={copy}
+              />
               <ToolButton
                 title="Descargar .md"
                 icon={<DownloadIcon fontSize="small" />}

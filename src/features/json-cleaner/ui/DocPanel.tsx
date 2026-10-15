@@ -326,7 +326,7 @@ export function DocPanel({
           onChange={(_, mode: PanelMode | null) => {
             if (!mode) return;
             track('json_view_mode', { mode });
-            onChange({ mode });
+            onChange(textFind && mode !== 'text' ? { mode, query: '' } : { mode });
           }}
           sx={{
             flexShrink: 0,
@@ -566,6 +566,7 @@ export function DocPanel({
               onChange={(text) => onChange({ text })}
               highlight={syntaxHighlightText}
               find={find}
+              foldable
               placeholder={`Pega aquí el log o JSON del Documento ${letter}...`}
               ariaLabel={'Contenido del documento ' + letter}
               onKeyDown={(e) => {

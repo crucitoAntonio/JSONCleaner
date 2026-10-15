@@ -144,10 +144,10 @@ export function SupportCard() {
           <Typography variant="subtitle2" sx={{ flex: 1, fontWeight: 700 }}>
             ¿Te ahorró tiempo? ☕
           </Typography>
-          <Tooltip title="Ocultar por 5 minutos">
+          <Tooltip title="Ocultar por 2 horas">
             <IconButton
               size="small"
-              aria-label="Ocultar por 5 minutos"
+              aria-label="Ocultar por 2 horas"
               onClick={() => {
                 track('support_dismiss');
                 hide('dismiss');

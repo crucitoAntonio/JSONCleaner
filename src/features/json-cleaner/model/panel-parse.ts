@@ -10,6 +10,7 @@ import {
   joinLogLines,
   unescapeQuotes,
 } from './parser';
+import { cleanInput } from './clean';
 
 const EMBEDDED_STATUS = 'JSON válido (extraído de objToStrJSON)';
 
@@ -68,6 +69,16 @@ export interface PanelParse {
 // Parseo "leniente en la entrada": quita prefijos de logcat, localiza el primer {...}/[...]
 // balanceado y, si falla, reintenta deshaciendo el escape CSV de comillas dobles ("").
 export function parsePanelText(raw: string): PanelParse {
+  const cleaned = cleanInput(raw);
+  const result = parseCore(cleaned.text);
+  if (!result.valid || cleaned.notes.length === 0) return result;
+  return {
+    ...result,
+    status: { kind: 'ok', text: result.status.text + ' · ' + cleaned.notes.join(', ') },
+  };
+}
+
+function parseCore(raw: string): PanelParse {
   if (!raw.trim()) {
     return {
       parsed: undefined,
@@ -109,8 +120,9 @@ export function parsePanelText(raw: string): PanelParse {
 // Último recurso, solo con permiso del usuario: jsonrepair arregla comas sobrantes, comillas
 // simples, claves sin comillas, comentarios, JSON truncado, etc. Devuelve el valor reparado, o
 // null si ni así se puede (o si el texto ya era válido y no hay nada que reparar).
-export function repairJson(raw: string): JsonValue | null {
-  if (!raw.trim() || parsePanelText(raw).valid) return null;
+export function repairJson(source: string): JsonValue | null {
+  const raw = cleanInput(source).text;
+  if (!raw.trim() || parseCore(raw).valid) return null;
   // extractJsonText une las líneas sin '\n' (reconstruye JSON partido entre líneas de logcat),
   // pero así un comentario `//` se tragaría el resto del documento. Se prueban ambas uniones y
   // gana la reparación que conserva más contenido.
